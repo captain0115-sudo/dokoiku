@@ -29,17 +29,21 @@ const REGION_KEYS = Object.keys(REGION_LABELS) as RegionKey[];
 export default function SearchForm({
   onSearch,
   loading,
+  initialMode,
+  initialRegion,
 }: {
   onSearch: (values: SearchValues) => void;
   loading: boolean;
+  initialMode?: RangeMode;
+  initialRegion?: RegionKey;
 }) {
   const [address, setAddress] = useState("");
   const [checkinDate, setCheckinDate] = useState("");
   const [checkoutDate, setCheckoutDate] = useState("");
   const [activePreset, setActivePreset] = useState<string | null>(null);
-  const [mode, setMode] = useState<RangeMode>("none");
+  const [mode, setMode] = useState<RangeMode>(initialMode ?? "none");
   const [band, setBand] = useState<TravelBand>("shortTrip");
-  const [region, setRegion] = useState<RegionKey>("kanto");
+  const [region, setRegion] = useState<RegionKey>(initialRegion ?? "kanto");
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);

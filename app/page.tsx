@@ -1,13 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import SearchForm, { SearchValues } from "@/components/SearchForm";
 import HotelList from "@/components/HotelList";
 import Logo from "@/components/Logo";
 import type { HotelResult } from "@/lib/rakuten";
 import { nightsBetween } from "@/lib/dates";
+import { regionKeyForPrefecture, type RegionKey } from "@/lib/prefectures";
 
 export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const prefillCode = searchParams.get("prefill");
+  const prefillRegion: RegionKey | undefined = prefillCode
+    ? regionKeyForPrefecture(prefillCode)
+    : undefined;
+
   const [hotels, setHotels] = useState<HotelResult[]>([]);
   const [originLabel, setOriginLabel] = useState<string>();
   const [rangeLabel, setRangeLabel] = useState<string>();
@@ -113,7 +129,12 @@ export default function Home() {
         </p>
       </header>
 
-      <SearchForm onSearch={handleSearch} loading={loading} />
+      <SearchForm
+        onSearch={handleSearch}
+        loading={loading}
+        initialMode={prefillRegion ? "region" : undefined}
+        initialRegion={prefillRegion}
+      />
 
       <section className="mt-8">
         {error && (
