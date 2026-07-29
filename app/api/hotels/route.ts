@@ -99,9 +99,10 @@ export async function GET(req: NextRequest) {
             homeLng: geo.lng,
             guests,
             filters,
-          }).then((hotels) =>
-            // どのエリアの検索で見つかったかをタグ付けしておく(グルーピング表示用)
-            hotels.map((h) => ({ ...h, areaName: pref.name }))
+          }).then(
+            (hotels): HotelResult[] =>
+              // どのエリアの検索で見つかったかをタグ付けしておく(グルーピング表示用)
+              hotels.map((h) => ({ ...h, areaName: pref.name }))
           )
       ),
       3
