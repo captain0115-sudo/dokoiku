@@ -3,10 +3,14 @@ import type { HotelResult } from "@/lib/rakuten";
 export default function HotelCard({
   hotel,
   highlighted,
+  nights = 1,
 }: {
   hotel: HotelResult;
   highlighted?: boolean;
+  nights?: number;
 }) {
+  const total = hotel.hotelMinCharge * nights;
+
   return (
     <a
       id={`hotel-${hotel.hotelNo}`}
@@ -39,19 +43,49 @@ export default function HotelCard({
             : "評価なし"}
         </p>
         {/* 価格情報はモバイル幅ではここに折り返して表示 */}
-        <p className="text-price font-mono font-semibold text-base mt-2 tabnum sm:hidden">
-          ¥{hotel.hotelMinCharge.toLocaleString()}〜
-        </p>
+        <div className="sm:hidden mt-2">
+          <PriceBlock
+            perNight={hotel.hotelMinCharge}
+            total={total}
+            nights={nights}
+          />
+        </div>
       </div>
 
       <div className="hidden sm:block text-right pl-4 border-l border-dashed border-line">
-        <p className="text-price font-mono font-semibold text-lg tabnum">
-          ¥{hotel.hotelMinCharge.toLocaleString()}〜
-        </p>
-        <p className="text-sub text-[10px] font-mono mt-0.5">
-          指定人数での最安プラン
-        </p>
+        <PriceBlock
+          perNight={hotel.hotelMinCharge}
+          total={total}
+          nights={nights}
+        />
       </div>
     </a>
+  );
+}
+
+function PriceBlock({
+  perNight,
+  total,
+  nights,
+}: {
+  perNight: number;
+  total: number;
+  nights: number;
+}) {
+  return (
+    <>
+      <p className="text-price font-mono font-semibold text-base sm:text-lg tabnum">
+        ¥{perNight.toLocaleString()}〜
+        <span className="text-[10px] text-sub font-normal ml-1">/ 1泊〜</span>
+      </p>
+      {nights > 1 && (
+        <p className="text-sub text-xs font-mono tabnum mt-0.5">
+          {nights}泊で目安 ¥{total.toLocaleString()}〜
+        </p>
+      )}
+      <p className="text-sub text-[10px] font-mono mt-0.5 hidden sm:block">
+        指定人数での最安プラン
+      </p>
+    </>
   );
 }

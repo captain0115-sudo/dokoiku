@@ -18,6 +18,15 @@ function addDays(d: Date, days: number): Date {
 
 export type DateRange = { checkinDate: string; checkoutDate: string };
 
+/** チェックイン・チェックアウト日から宿泊数(泊)を計算する */
+export function nightsBetween(checkinDate: string, checkoutDate: string): number {
+  const checkin = new Date(checkinDate);
+  const checkout = new Date(checkoutDate);
+  const diffMs = checkout.getTime() - checkin.getTime();
+  const nights = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  return nights > 0 ? nights : 1;
+}
+
 /** 今夜(今日チェックイン・翌日チェックアウト) */
 export function tonightRange(now = new Date()): DateRange {
   return {

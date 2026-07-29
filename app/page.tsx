@@ -5,6 +5,7 @@ import SearchForm, { SearchValues } from "@/components/SearchForm";
 import HotelList from "@/components/HotelList";
 import Logo from "@/components/Logo";
 import type { HotelResult } from "@/lib/rakuten";
+import { nightsBetween } from "@/lib/dates";
 
 export default function Home() {
   const [hotels, setHotels] = useState<HotelResult[]>([]);
@@ -18,6 +19,7 @@ export default function Home() {
   const [error, setError] = useState<string>();
   const [searched, setSearched] = useState(false);
   const [pickedHotelNo, setPickedHotelNo] = useState<number | null>(null);
+  const [nights, setNights] = useState(1);
 
   function buildQuery(values: SearchValues) {
     const query = new URLSearchParams({
@@ -44,6 +46,7 @@ export default function Home() {
     setSearched(true);
     setPickedHotelNo(null);
     setSearchedAreas([]);
+    setNights(nightsBetween(values.checkinDate, values.checkoutDate));
 
     try {
       // 先に「どのエリアを検索するか」だけ軽量に取得し、待ち時間中に表示する
@@ -163,6 +166,7 @@ export default function Home() {
               hotels={hotels}
               originLabel={originLabel}
               highlightedHotelNo={pickedHotelNo}
+              nights={nights}
             />
           </>
         )}

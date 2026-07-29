@@ -5,10 +5,12 @@ export default function HotelList({
   hotels,
   originLabel,
   highlightedHotelNo,
+  nights,
 }: {
   hotels: HotelResult[];
   originLabel?: string;
   highlightedHotelNo?: number | null;
+  nights?: number;
 }) {
   if (hotels.length === 0) {
     return (
@@ -42,8 +44,11 @@ export default function HotelList({
         )}
       </div>
       <p className="px-5 py-2 text-sub text-xs font-body bg-bg/60 border-b border-line">
-        表示価格は指定人数条件での最安プランの目安です。税・サービス料の
-        取り扱いは施設により異なるため、予約前に予約サイト側で最終確認してください。
+        表示価格は<strong>1泊あたり</strong>の、指定人数条件での最安プランの目安です。
+        {nights && nights > 1 &&
+          `${nights}泊の合計目安額もあわせて表示しています。`}
+        税・サービス料の取り扱いは施設により異なるため、予約前に予約サイト側で
+        最終確認してください。
       </p>
 
       {groups.map((group) => (
@@ -59,6 +64,7 @@ export default function HotelList({
                 key={hotel.hotelNo}
                 hotel={hotel}
                 highlighted={hotel.hotelNo === highlightedHotelNo}
+                nights={nights}
               />
             ))}
           </div>
