@@ -1,0 +1,35 @@
+@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f6f7f9;
+  color: #1c2530;
+}
+
+/* 価格・距離などの数字を桁揃えで見せる */
+.tabnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  .board-input {
+    @apply bg-surface border border-line rounded-lg px-3 py-2.5 text-sm text-ink font-body
+      focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent
+      placeholder:text-sub/60 transition-colors;
+  }
+
+  .pill-button {
+    @apply px-3.5 py-2 rounded-full border text-sm font-body transition-colors;
+  }
+
+  .pill-button-active {
+    @apply bg-accent text-white border-accent;
+  }
+
+  .pill-button-inactive {
+    @apply bg-surface text-sub border-line hover:border-accent/50 hover:text-ink;
+  }
+}
