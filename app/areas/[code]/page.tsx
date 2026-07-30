@@ -12,6 +12,10 @@ import {
 } from "@/lib/prefectures";
 import { searchVacantHotelsByArea, type HotelResult } from "@/lib/rakuten";
 import { thisWeekendRange, nightsBetween } from "@/lib/dates";
+import ShareButtons from "@/components/ShareButtons";
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
 
 // ページは事前生成せず、初回アクセス時にサーバー側で生成 → 1時間キャッシュ(ISR)。
 // 47都道府県ぶんをビルド時に一括生成すると、デプロイのたびに楽天APIへ
@@ -70,8 +74,79 @@ export default async function AreaPage({ params }: Props) {
     fetchFailed = true;
   }
 
+  const pageUrl = `${siteUrl}/areas/${pref.middleClassCode}`;
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "どこいく", item: siteUrl },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `${pref.name}のホテル空室状況`,
+        item: pageUrl,
+      },
+    ],
+  };
+
+  // 実際に取得できた空室ホテルのみを構造化データ化する(架空の在庫を作らない)
+  const itemListJsonLd =
+    hotels.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListOrder: "https://schema.org/ItemListOrderAscending",
+          numberOfItems: hotels.length,
+          itemListElement: hotels.map((hotel, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+              "@type": "LodgingBusiness",
+              name: hotel.hotelName,
+              url: hotel.hotelInformationUrl,
+              image: hotel.hotelImageUrl,
+              ...(hotel.reviewAverage != null
+                ? {
+                    aggregateRating: {
+                      "@type": "AggregateRating",
+                      ratingValue: hotel.reviewAverage,
+                      bestRating: 5,
+                    },
+                  }
+                : {}),
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: hotel.latitude,
+                longitude: hotel.longitude,
+              },
+              makesOffer: {
+                "@type": "Offer",
+                price: hotel.hotelMinCharge,
+                priceCurrency: "JPY",
+                url: hotel.planListUrl,
+                availability: "https://schema.org/InStock",
+              },
+            },
+          })),
+        }
+      : null;
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      {itemListJsonLd && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        />
+      )}
+
       <div className="mb-8">
         <Link href="/">
           <Logo />
@@ -96,13 +171,17 @@ export default async function AreaPage({ params }: Props) {
         検索フォームをお使いください。
       </p>
 
-      <div className="mb-8">
+      <div className="mb-8 flex flex-wrap items-center gap-3">
         <Link
           href={`/?mode=region&prefill=${pref.middleClassCode}`}
           className="inline-block px-6 py-3 rounded-full bg-accent text-white font-display font-bold text-sm hover:brightness-110 transition"
         >
           自分の日程で{pref.name}を検索する
         </Link>
+        <ShareButtons
+          url={pageUrl}
+          text={`${pref.name}のホテル空室状況(${pref.catchphrase}) | どこいく`}
+        />
       </div>
 
       {fetchFailed && (

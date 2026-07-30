@@ -1,5 +1,9 @@
 import type { HotelResult } from "@/lib/rakuten";
 import HotelCard from "./HotelCard";
+import ShareButtons from "./ShareButtons";
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
 
 export default function HotelList({
   hotels,
@@ -35,13 +39,19 @@ export default function HotelList({
 
   return (
     <div className="bg-surface border border-line rounded-2xl overflow-hidden shadow-sm">
-      <div className="flex items-baseline justify-between px-5 py-4 border-b border-line">
-        <h2 className="font-display font-bold text-ink text-base">
-          空室 {hotels.length}件
-        </h2>
-        {originLabel && (
-          <span className="text-sub text-xs font-mono">起点: {originLabel}</span>
-        )}
+      <div className="flex items-center justify-between flex-wrap gap-2 px-5 py-4 border-b border-line">
+        <div className="flex items-baseline gap-3">
+          <h2 className="font-display font-bold text-ink text-base">
+            空室 {hotels.length}件
+          </h2>
+          {originLabel && (
+            <span className="text-sub text-xs font-mono">起点: {originLabel}</span>
+          )}
+        </div>
+        <ShareButtons
+          url={siteUrl}
+          text="行き先じゃなく、日付から探すホテル検索「どこいく」"
+        />
       </div>
       <p className="px-5 py-2 text-sub text-xs font-body bg-bg/60 border-b border-line">
         表示価格は<strong>1泊あたり</strong>の、指定人数条件での最安プランの目安です。
