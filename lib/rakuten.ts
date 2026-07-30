@@ -177,6 +177,13 @@ async function requestVacantHotels(
       // 一致させる必要があります。ローカル開発中は登録ドメインと異なるため、
       // 403エラーになる場合があります(その場合は本番ドメインでの動作確認、
       // またはローカル開発用ドメインの追加登録をご検討ください)。
+      // 2026-07-30 時点の動作確認により、楽天ウェブサービス側で実際に
+      // 「許可されたWebサイト」として登録・機能しているのは
+      // https://dokoiku.com であることが判明した(https://www.dokoiku.tokyo /
+      // https://dokoiku.tokyo はいずれも403 HTTP_REFERRER_NOT_ALLOWED)。
+      // 実ドメインと不一致だが、登録変更には人間の確認・作業(楽天側の設定変更)が
+      // 必要なため、動作を壊さないようフォールバック値は変更していない。
+      // 詳細はユーザーへの報告を参照。
       Origin: process.env.RAKUTEN_ORIGIN ?? "https://dokoiku.com",
       Referer: process.env.RAKUTEN_ORIGIN ?? "https://dokoiku.com",
     },
