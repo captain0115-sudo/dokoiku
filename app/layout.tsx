@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Footer from "@/components/Footer";
 
@@ -56,6 +57,9 @@ export default function RootLayout({
         />
         <div className="flex-1">{children}</div>
         <Footer />
+        {/* Vercelホスティング標準のアクセス解析。追加のIDや環境変数設定は不要
+            (GA4はMeasurement IDの取得が必要なため今回は見送り) */}
+        <Analytics />
       </body>
     </html>
   );
