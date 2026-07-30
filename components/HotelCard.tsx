@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { HotelResult } from "@/lib/rakuten";
 
 export default function HotelCard({
@@ -21,11 +22,15 @@ export default function HotelCard({
         highlighted ? "ring-2 ring-accent bg-accentSoft" : "hover:bg-bg"
       }`}
     >
-      <img
-        src={hotel.hotelImageUrl}
-        alt={hotel.hotelName}
-        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-line"
-      />
+      <div className="relative w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-xl overflow-hidden border border-line bg-bg">
+        <Image
+          src={hotel.hotelImageUrl}
+          alt={hotel.hotelName}
+          fill
+          sizes="(min-width: 640px) 128px, 96px"
+          className="object-cover"
+        />
+      </div>
 
       <div className="min-w-0">
         {highlighted && (
