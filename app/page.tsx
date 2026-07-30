@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import SearchForm, { SearchValues } from "@/components/SearchForm";
 import HotelList from "@/components/HotelList";
+import HotelListSkeleton from "@/components/HotelListSkeleton";
 import Logo from "@/components/Logo";
 import type { HotelResult } from "@/lib/rakuten";
 import { nightsBetween } from "@/lib/dates";
@@ -117,16 +118,29 @@ function HomeContent() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
-      <header className="mb-10">
-        <div className="mb-4">
-          <Logo />
+      <header className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-accentSoft via-surface to-white px-6 py-10 sm:px-10 sm:py-14 mb-10">
+        {/* 画像アセット不要な範囲での装飾(ぼかした円の重なりで奥行きを演出) */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-16 -right-16 w-64 h-64 rounded-full bg-accent/10 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-20 -left-10 w-56 h-56 rounded-full bg-price/10 blur-3xl"
+        />
+        <div className="relative">
+          <div className="mb-5">
+            <Logo />
+          </div>
+          <h1 className="font-display font-black text-3xl md:text-5xl text-ink leading-tight">
+            行き先じゃなく、
+            <br className="sm:hidden" />
+            日付から。
+          </h1>
+          <p className="text-sub mt-4 font-body text-sm md:text-base max-w-md">
+            日付と自宅からの範囲で、今空いているホテルを価格順に見つけます。
+          </p>
         </div>
-        <h1 className="font-display font-black text-3xl md:text-4xl text-ink">
-          行き先じゃなく、日付から。
-        </h1>
-        <p className="text-sub mt-3 font-body text-sm">
-          日付と自宅からの範囲で、今空いているホテルを価格順に見つけます。
-        </p>
       </header>
 
       <SearchForm
@@ -142,13 +156,16 @@ function HomeContent() {
         )}
 
         {loading && (
-          <div className="text-sub font-body text-sm">
-            <p>空室情報を取得中…(複数エリアを検索しているため少し時間がかかります)</p>
-            {searchedAreas.length > 0 && (
-              <p className="text-xs font-mono mt-1">
-                検索中: {searchedAreas.join(" / ")}
-              </p>
-            )}
+          <div>
+            <div className="text-sub font-body text-sm mb-3">
+              <p>空室情報を取得中…(複数エリアを検索しているため少し時間がかかります)</p>
+              {searchedAreas.length > 0 && (
+                <p className="text-xs font-mono mt-1">
+                  検索中: {searchedAreas.join(" / ")}
+                </p>
+              )}
+            </div>
+            <HotelListSkeleton />
           </div>
         )}
 

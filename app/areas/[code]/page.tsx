@@ -8,7 +8,7 @@ import {
   regionKeyForPrefecture,
   prefecturesInRegion,
   REGION_LABELS,
-  PREFECTURES,
+  type RegionKey,
 } from "@/lib/prefectures";
 import { searchVacantHotelsByArea, type HotelResult } from "@/lib/rakuten";
 import { thisWeekendRange, nightsBetween } from "@/lib/dates";
@@ -152,21 +152,34 @@ export default async function AreaPage({ params }: Props) {
       )}
 
       <section>
-        <h2 className="font-display font-bold text-ink text-base mb-3">
+        <h2 className="font-display font-bold text-ink text-base mb-4">
           全都道府県から探す
         </h2>
-        <div className="flex flex-wrap gap-2">
-          {PREFECTURES.filter((p) => p.middleClassCode !== pref.middleClassCode).map(
-            (p) => (
-              <Link
-                key={p.middleClassCode}
-                href={`/areas/${p.middleClassCode}`}
-                className="pill-button pill-button-inactive text-xs"
-              >
-                {p.name}
-              </Link>
-            )
-          )}
+        <div className="flex flex-col gap-4">
+          {(Object.keys(REGION_LABELS) as RegionKey[]).map((key) => {
+            const prefsInRegion = prefecturesInRegion(key).filter(
+              (p) => p.middleClassCode !== pref.middleClassCode
+            );
+            if (prefsInRegion.length === 0) return null;
+            return (
+              <div key={key}>
+                <p className="text-sub text-xs font-mono tracking-wideLabel uppercase mb-2">
+                  {REGION_LABELS[key]}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {prefsInRegion.map((p) => (
+                    <Link
+                      key={p.middleClassCode}
+                      href={`/areas/${p.middleClassCode}`}
+                      className="pill-button pill-button-inactive text-xs"
+                    >
+                      {p.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
     </main>
