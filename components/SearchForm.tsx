@@ -31,15 +31,19 @@ export default function SearchForm({
   loading,
   initialMode,
   initialRegion,
+  initialCheckinDate,
+  initialCheckoutDate,
 }: {
   onSearch: (values: SearchValues) => void;
   loading: boolean;
   initialMode?: RangeMode;
   initialRegion?: RegionKey;
+  initialCheckinDate?: string;
+  initialCheckoutDate?: string;
 }) {
   const [address, setAddress] = useState("");
-  const [checkinDate, setCheckinDate] = useState("");
-  const [checkoutDate, setCheckoutDate] = useState("");
+  const [checkinDate, setCheckinDate] = useState(initialCheckinDate ?? "");
+  const [checkoutDate, setCheckoutDate] = useState(initialCheckoutDate ?? "");
   const [activePreset, setActivePreset] = useState<string | null>(null);
   const [mode, setMode] = useState<RangeMode>(initialMode ?? "none");
   const [band, setBand] = useState<TravelBand>("shortTrip");

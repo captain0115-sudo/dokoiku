@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import SearchForm, { SearchValues } from "@/components/SearchForm";
 import HotelList from "@/components/HotelList";
 import HotelListSkeleton from "@/components/HotelListSkeleton";
@@ -24,6 +25,8 @@ function HomeContent() {
   const prefillRegion: RegionKey | undefined = prefillCode
     ? regionKeyForPrefecture(prefillCode)
     : undefined;
+  const prefillCheckin = searchParams.get("checkin") ?? undefined;
+  const prefillCheckout = searchParams.get("checkout") ?? undefined;
 
   const [hotels, setHotels] = useState<HotelResult[]>([]);
   const [originLabel, setOriginLabel] = useState<string>();
@@ -140,6 +143,12 @@ function HomeContent() {
           <p className="text-sub mt-4 font-body text-sm md:text-base max-w-md">
             日付と自宅からの範囲で、今空いているホテルを価格順に見つけます。
           </p>
+          <Link
+            href="/obon2026"
+            className="inline-flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-white/70 border border-line text-ink text-xs font-mono font-semibold hover:bg-white transition"
+          >
+            🎋 季節特集: お盆休み2026(8/13〜8/16)の空室ホテルを見る
+          </Link>
         </div>
       </header>
 
@@ -148,6 +157,8 @@ function HomeContent() {
         loading={loading}
         initialMode={prefillRegion ? "region" : undefined}
         initialRegion={prefillRegion}
+        initialCheckinDate={prefillCheckin}
+        initialCheckoutDate={prefillCheckout}
       />
 
       <section className="mt-8">

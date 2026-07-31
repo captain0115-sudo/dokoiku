@@ -13,6 +13,16 @@ export default function Footer() {
     <footer className="max-w-3xl mx-auto px-4 py-8 mt-4">
       <div className="border-t border-line pt-6 flex flex-col gap-4">
         <div>
+          <p className="text-sub text-xs font-mono mb-2">特集</p>
+          <Link
+            href="/obon2026"
+            className="text-sub text-xs font-body underline hover:text-ink"
+          >
+            お盆休み2026の空室ホテル特集
+          </Link>
+        </div>
+
+        <div>
           <p className="text-sub text-xs font-mono mb-2">エリアから探す</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1">
             {FEATURED_AREAS.map((area) => (
