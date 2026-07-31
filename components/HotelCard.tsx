@@ -91,6 +91,23 @@ function PriceBlock({
       <p className="text-sub text-[10px] font-mono mt-0.5 hidden sm:block">
         指定人数での最安プラン
       </p>
+      {/* カード全体がリンクであることが伝わりにくいため、クリック先を明示するCTA表記 */}
+      <span className="inline-flex items-center gap-0.5 mt-2 text-[11px] font-mono font-semibold text-accent whitespace-nowrap">
+        空室・料金を見る
+        <svg
+          width="11"
+          height="11"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 6l6 6-6 6" />
+        </svg>
+      </span>
     </>
   );
 }

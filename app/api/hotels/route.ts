@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { geocodeAddress } from "@/lib/geocode";
 import { searchVacantHotelsByArea, HotelResult } from "@/lib/rakuten";
+import { runWithConcurrencyLimit } from "@/lib/concurrency";
 import {
   prefecturesInBand,
   defaultPrefectures,
@@ -150,32 +151,4 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-/**
- * 同時実行数を絞ってPromiseを実行するヘルパー。
- * 各タスクの成功/失敗は Promise.allSettled と同じ形式で返す。
- */
-async function runWithConcurrencyLimit<T>(
-  tasks: Array<() => Promise<T>>,
-  limit: number
-): Promise<PromiseSettledResult<T>[]> {
-  const results: PromiseSettledResult<T>[] = new Array(tasks.length);
-  let cursor = 0;
-
-  async function worker() {
-    while (cursor < tasks.length) {
-      const index = cursor++;
-      try {
-        const value = await tasks[index]();
-        results[index] = { status: "fulfilled", value };
-      } catch (reason) {
-        results[index] = { status: "rejected", reason };
-      }
-    }
-  }
-
-  const workers = Array.from({ length: Math.min(limit, tasks.length) }, worker);
-  await Promise.all(workers);
-  return results;
 }
