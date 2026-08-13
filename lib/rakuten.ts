@@ -152,7 +152,6 @@ async function requestVacantHotels(
     lowClassNum: String(childNum), // 子供(小学生)。MVPでは学年区分をせず1本化
     infantWithBNum: String(infantNum), // 幼児(布団のみ)。MVPでの代表的な扱い
     roomNum: String(roomNum),
-    responseType: "small",
     hits: "30",
     ...areaOrLocationParams,
   });
@@ -201,10 +200,19 @@ async function requestVacantHotels(
 
   const results: HotelResult[] = data.hotels.map((h: any) => {
     const basic = h.hotel[0].hotelBasicInfo;
+    // basic.hotelMinChargeは楽天の仕様上「1部屋1泊あたりの最安値の目安」であり、
+    // 検索条件のadultNum(人数)に対応した金額とは限らない(実際に検証したところ、
+    // 指定人数では成立しない安いプランの金額が混ざり、実際の1名利用料金より
+    // 大幅に低く表示されるケースが確認された)。h.hotel[1].roomInfoには
+    // 検索条件(人数・日程)に一致する実際のプランの日別料金(dailyCharge)が
+    // 含まれているため、取得できる場合はそちらを優先して使う(2026-08-13対応)。
+    const roomInfoEntries: any[] = h.hotel[1]?.roomInfo ?? [];
+    const dailyChargeEntry = roomInfoEntries.find((e) => e.dailyCharge);
+    const accurateCharge = dailyChargeEntry?.dailyCharge?.total;
     return {
       hotelNo: basic.hotelNo,
       hotelName: basic.hotelName,
-      hotelMinCharge: basic.hotelMinCharge,
+      hotelMinCharge: accurateCharge ?? basic.hotelMinCharge,
       latitude: basic.latitude,
       longitude: basic.longitude,
       hotelImageUrl: basic.hotelImageUrl,
