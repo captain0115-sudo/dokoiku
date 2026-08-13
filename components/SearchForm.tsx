@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@vercel/analytics";
 import { REGION_LABELS, RegionKey } from "@/lib/prefectures";
 import { BAND_LABELS, BAND_HINTS, TravelBand } from "@/lib/distanceBands";
 import { tonightRange, tomorrowRange, thisWeekendRange, DateRange } from "@/lib/dates";
@@ -60,6 +61,16 @@ export default function SearchForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // 広告経由の流入がどこまで検索実行(コンバージョンの第一歩)に至っているかを見るための
+    // イベント計測。住所などの個人情報は送らず、検索条件の傾向のみ記録する。
+    track("search_submit", {
+      mode,
+      preset: activePreset ?? "custom",
+      onsen,
+      nonSmoking,
+      hasMaxCharge: Boolean(maxCharge),
+      sort,
+    });
     onSearch({
       address,
       checkinDate,

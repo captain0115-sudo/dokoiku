@@ -170,31 +170,29 @@ async function requestVacantHotels(
     query.set("maxCharge", String(filters.maxCharge));
   }
 
-  const res = await fetch(`${RAKUTEN_ENDPOINT}?${query.toString()}`, {
-    headers: {
-      accessKey, // ヘッダーでの指定も可能なため、念のため両方に付与
-      // 楽天ウェブサービスの「許可されたWebサイト」に登録したドメインと
-      // 一致させる必要があります。ローカル開発中は登録ドメインと異なるため、
-      // 403エラーになる場合があります(その場合は本番ドメインでの動作確認、
-      // またはローカル開発用ドメインの追加登録をご検討ください)。
-      // 2026-07-30 時点の動作確認により、楽天ウェブサービス側で実際に
-      // 「許可されたWebサイト」として登録・機能しているのは
-      // https://dokoiku.com であることが判明した(https://www.dokoiku.tokyo /
-      // https://dokoiku.tokyo はいずれも403 HTTP_REFERRER_NOT_ALLOWED)。
-      // 実ドメインと不一致だが、登録変更には人間の確認・作業(楽天側の設定変更)が
-      // 必要なため、動作を壊さないようフォールバック値は変更していない。
-      // 詳細はユーザーへの報告を参照。
-      Origin: process.env.RAKUTEN_ORIGIN ?? "https://dokoiku.com",
-      Referer: process.env.RAKUTEN_ORIGIN ?? "https://dokoiku.com",
-    },
-  });
+  const requestUrl = `${RAKUTEN_ENDPOINT}?${query.toString()}`;
+  const requestHeaders = {
+    accessKey, // ヘッダーでの指定も可能なため、念のため両方に付与
+    // 楽天ウェブサービスの「許可されたWebサイト」に登録したドメインと
+    // 一致させる必要があります。ローカル開発中は登録ドメインと異なるため、
+    // 403エラーになる場合があります(その場合は本番ドメインでの動作確認、
+    // またはローカル開発用ドメインの追加登録をご検討ください)。
+    // 2026-07-30 時点の動作確認により、楽天ウェブサービス側で実際に
+    // 「許可されたWebサイト」として登録・機能しているのは
+    // https://dokoiku.com であることが判明した(https://www.dokoiku.tokyo /
+    // https://dokoiku.tokyo はいずれも403 HTTP_REFERRER_NOT_ALLOWED)。
+    // 実ドメインと不一致だが、登録変更には人間の確認・作業(楽天側の設定変更)が
+    // 必要なため、動作を壊さないようフォールバック値は変更していない。
+    // 詳細はユーザーへの報告を参照。
+    Origin: process.env.RAKUTEN_ORIGIN ?? "https://dokoiku.com",
+    Referer: process.env.RAKUTEN_ORIGIN ?? "https://dokoiku.com",
+  };
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Rakuten API error (${res.status}): ${body}`);
-  }
-
-  const data = await res.json();
+  // 楽天API呼び出しは単発だとタイムアウト・一時的な5xxで失敗しやすいため、
+  // 1回だけ短い間隔をおいて再試行する(2026-08-13、広告経由の流入増を見込んだ改善。
+  // 神奈川・沖縄など特集ページの一部エリアが取得失敗する事象が過去に発生していた)。
+  // 403等クライアントエラー(設定不備)はリトライしても無駄なため即座に投げる。
+  const data = await fetchWithRetry(requestUrl, requestHeaders);
 
   if (!data.hotels) {
     return [];
@@ -227,6 +225,43 @@ async function requestVacantHotels(
   });
 
   return results;
+}
+
+/**
+ * 楽天APIへのfetchを実行し、5xxやネットワークエラーの場合のみ1回だけ再試行する。
+ * 401/403/429等のクライアントエラーは設定・レート制限の問題でリトライしても
+ * 解決しないため即座にthrowする。
+ */
+async function fetchWithRetry(
+  url: string,
+  headers: Record<string, string>,
+  retriesLeft = 1
+): Promise<any> {
+  let res: Response;
+  try {
+    res = await fetch(url, { headers });
+  } catch (err) {
+    if (retriesLeft > 0) {
+      await sleep(300);
+      return fetchWithRetry(url, headers, retriesLeft - 1);
+    }
+    throw err;
+  }
+
+  if (!res.ok) {
+    const body = await res.text();
+    if (res.status >= 500 && retriesLeft > 0) {
+      await sleep(300);
+      return fetchWithRetry(url, headers, retriesLeft - 1);
+    }
+    throw new Error(`Rakuten API error (${res.status}): ${body}`);
+  }
+
+  return res.json();
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function clampSearchRadius(km: number): number {

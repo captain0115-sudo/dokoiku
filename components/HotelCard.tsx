@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { track } from "@vercel/analytics";
 import type { HotelResult } from "@/lib/rakuten";
 
 export default function HotelCard({
@@ -18,6 +21,15 @@ export default function HotelCard({
       href={hotel.planListUrl}
       target="_blank"
       rel="noopener noreferrer sponsored"
+      onClick={() =>
+        // 楽天への実際の送客(コンバージョンの最終ステップ)を計測する。
+        // 個人情報は含めず、ホテル名・価格・距離帯など集計に必要な情報のみ送る。
+        track("hotel_click", {
+          hotelName: hotel.hotelName,
+          price: hotel.hotelMinCharge,
+          highlighted: Boolean(highlighted),
+        })
+      }
       className={`grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-3 sm:gap-4 items-center py-4 px-2 rounded-xl transition-colors ${
         highlighted ? "ring-2 ring-accent bg-accentSoft" : "hover:bg-bg"
       }`}
