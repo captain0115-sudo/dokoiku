@@ -101,11 +101,12 @@ export default async function AreaVariantPage({ code, variant }: Props) {
               name: hotel.hotelName,
               url: hotel.hotelInformationUrl,
               image: hotel.hotelImageUrl,
-              ...(hotel.reviewAverage != null
+              ...(hotel.reviewAverage != null && hotel.reviewCount != null
                 ? {
                     aggregateRating: {
                       "@type": "AggregateRating",
                       ratingValue: hotel.reviewAverage,
+                      reviewCount: hotel.reviewCount,
                       bestRating: 5,
                     },
                   }

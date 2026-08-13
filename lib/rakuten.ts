@@ -16,6 +16,7 @@ export type HotelResult = {
   hotelInformationUrl: string;
   planListUrl: string; // チェックイン/チェックアウト・人数条件を反映したプラン一覧URL
   reviewAverage: number | null;
+  reviewCount: number | null;
   distanceKm: number;
   areaName?: string; // どのエリア(都道府県)の検索で見つかったか。route側で付与
 };
@@ -215,6 +216,7 @@ async function requestVacantHotels(
         guests
       ),
       reviewAverage: basic.reviewAverage,
+      reviewCount: basic.reviewCount ?? null,
       distanceKm: haversineDistanceKm(
         homeLat,
         homeLng,
