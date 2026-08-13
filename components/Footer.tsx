@@ -1,11 +1,20 @@
 import Link from "next/link";
+import { REGION_LABELS, prefecturesInRegion, type RegionKey } from "@/lib/prefectures";
 
-const FEATURED_AREAS: { name: string; code: string }[] = [
-  { name: "東京都", code: "tokyo" },
-  { name: "大阪府", code: "osaka" },
-  { name: "北海道", code: "hokkaido" },
-  { name: "福岡県", code: "fukuoka" },
-  { name: "沖縄県", code: "okinawa" },
+// 全都道府県への内部リンクをフッターに設置する(全ページ共通)。
+// 以前は東京・大阪・北海道・福岡・沖縄の5県のみで、残り42県はサイトマップ経由でしか
+// 発見されにくい状態だった(2026-08-13のSEO監査で指摘、地方ごとにグルーピングして解消)。
+const REGION_ORDER: RegionKey[] = [
+  "hokkaido",
+  "tohoku",
+  "kanto",
+  "koshinetsu",
+  "hokuriku",
+  "tokai",
+  "kinki",
+  "chugoku",
+  "shikoku",
+  "kyushuOkinawa",
 ];
 
 export default function Footer() {
@@ -23,16 +32,23 @@ export default function Footer() {
         </div>
 
         <div>
-          <p className="text-sub text-xs font-mono mb-2">エリアから探す</p>
-          <div className="flex flex-wrap gap-x-3 gap-y-1">
-            {FEATURED_AREAS.map((area) => (
-              <Link
-                key={area.code}
-                href={`/areas/${area.code}`}
-                className="text-sub text-xs font-body underline hover:text-ink"
-              >
-                {area.name}
-              </Link>
+          <p className="text-sub text-xs font-mono mb-2">エリアから探す(全47都道府県)</p>
+          <div className="flex flex-col gap-2">
+            {REGION_ORDER.map((region) => (
+              <div key={region} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="text-sub text-[10px] font-mono shrink-0 w-12">
+                  {REGION_LABELS[region]}
+                </span>
+                {prefecturesInRegion(region).map((pref) => (
+                  <Link
+                    key={pref.middleClassCode}
+                    href={`/areas/${pref.middleClassCode}`}
+                    className="text-sub text-xs font-body underline hover:text-ink"
+                  >
+                    {pref.name}
+                  </Link>
+                ))}
+              </div>
             ))}
           </div>
         </div>

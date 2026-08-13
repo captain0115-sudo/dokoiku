@@ -220,6 +220,77 @@ function HomeContent() {
           </>
         )}
       </section>
+
+      {/* SEO監査(2026-08-13)で指摘: H2見出しが一切なくサービス説明が薄いとのことで追加。
+          既存機能の説明のみで、実績・効果を誇張する表現は入れない。 */}
+      <section className="mt-14">
+        <h2 className="font-display font-bold text-xl text-ink mb-4">
+          どこいくの特徴
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-line bg-surface p-4">
+            <p className="font-body font-semibold text-sm text-ink mb-1">
+              行き先じゃなく日付から探す
+            </p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              先に「いつ空いているか」を決めてから、その日程で泊まれる宿を探せます。行き先を先に決めなくても検索できます。
+            </p>
+          </div>
+          <div className="rounded-2xl border border-line bg-surface p-4">
+            <p className="font-body font-semibold text-sm text-ink mb-1">
+              価格順で一覧表示
+            </p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              検索結果は宿泊料金の安い順に並びます。一件ずつ開いて比較する手間を減らせます。
+            </p>
+          </div>
+          <div className="rounded-2xl border border-line bg-surface p-4">
+            <p className="font-body font-semibold text-sm text-ink mb-1">
+              自宅からの範囲・地方で絞り込み
+            </p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              自宅から◯km圏内、または地方単位(関東・関西など)で検索範囲を指定できます。複数エリアの空室を一度に比較できます。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-display font-bold text-xl text-ink mb-4">
+          使い方
+        </h2>
+        <ol className="grid gap-3 sm:grid-cols-3 list-none">
+          <li className="rounded-2xl border border-line bg-surface p-4">
+            <p className="font-mono text-xs text-accent mb-1">STEP 1</p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              チェックイン・チェックアウトの日付を入力します。
+            </p>
+          </li>
+          <li className="rounded-2xl border border-line bg-surface p-4">
+            <p className="font-mono text-xs text-accent mb-1">STEP 2</p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              行き先の範囲(自宅からの距離、または地方)を必要に応じて指定します。
+            </p>
+          </li>
+          <li className="rounded-2xl border border-line bg-surface p-4">
+            <p className="font-mono text-xs text-accent mb-1">STEP 3</p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              検索ボタンを押すと、条件に合う宿が価格順に一覧表示されます。
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <section className="mt-10 mb-4">
+        <h2 className="font-display font-bold text-xl text-ink mb-4">
+          こんな時に
+        </h2>
+        <ul className="text-sub text-sm font-body leading-relaxed list-disc pl-5 space-y-1">
+          <li>週末や連休の予定が直前まで決まっていないとき、空いている日程から旅先を考えたい</li>
+          <li>出張や帰省のついでに、決まった日程で近隣エリアの宿を安く探したい</li>
+          <li>特定の1軒にこだわらず、価格が安い宿を優先して選びたい</li>
+        </ul>
+      </section>
     </main>
   );
 }

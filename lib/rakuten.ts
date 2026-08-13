@@ -245,7 +245,7 @@ async function requestVacantHotels(
 async function fetchWithRetry(
   url: string,
   headers: Record<string, string>,
-  retriesLeft = 1
+  retriesLeft = 2
 ): Promise<any> {
   let res: Response;
   try {
@@ -260,6 +260,14 @@ async function fetchWithRetry(
 
   if (!res.ok) {
     const body = await res.text();
+    // 429(レート制限)は複数エリアを同時取得するページ(お盆特集等)で頻発することを確認済み。
+    // 楽天側のエラーメッセージが「Try again in 1 seconds」等と案内するため、5xxより長めに待って
+    // 再試行する(2026-08-13対応、以前は429を意図的にリトライ対象外にしていたが、
+    // 短時間の待機であれば悪化させずに解消できることを確認したため対象に含めた)。
+    if (res.status === 429 && retriesLeft > 0) {
+      await sleep(1500);
+      return fetchWithRetry(url, headers, retriesLeft - 1);
+    }
     if (res.status >= 500 && retriesLeft > 0) {
       await sleep(300);
       return fetchWithRetry(url, headers, retriesLeft - 1);

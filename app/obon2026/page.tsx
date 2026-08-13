@@ -68,7 +68,10 @@ export default async function Obon2026Page() {
           guests: { adults: 1 },
         })
     ),
-    3
+    // 6エリア同時取得は楽天API側の429(レート制限)を誘発しやすいことを確認済み
+    // (2026-08-13)。fetchWithRetryの429リトライ強化と合わせて、同時実行数も
+    // 3→2に絞り、レート制限そのものを起きにくくする。
+    2
   );
 
   const sections: AreaSection[] = prefectures.map((pref, i) => {
