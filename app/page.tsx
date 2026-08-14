@@ -8,8 +8,37 @@ import HotelList from "@/components/HotelList";
 import HotelListSkeleton from "@/components/HotelListSkeleton";
 import Logo from "@/components/Logo";
 import type { HotelResult } from "@/lib/rakuten";
-import { nightsBetween } from "@/lib/dates";
+import { nightsBetween, thisWeekendRange, tomorrowRange } from "@/lib/dates";
 import { regionKeyForPrefecture, type RegionKey } from "@/lib/prefectures";
+import type { TravelBand } from "@/lib/distanceBands";
+
+const FAQ_ITEMS = [
+  {
+    q: "行き先を決めずに検索して大丈夫ですか?",
+    a: "検索結果ではホテル名・写真・口コミ評価・自宅からの距離を確認してから選べます。自動で予約されることはなく、実際に泊まるホテルは表示された候補の中から自分で選んで予約ページに進む形です。",
+  },
+  {
+    q: "表示されている価格は本当にその金額で泊まれますか?",
+    a: "検索時に指定した人数で実際に予約できるプランの料金を表示しています(部屋単位の目安ではなく、指定人数条件に一致する料金です)。最終的な金額・空室状況は、予約ページ(楽天トラベル)で改めてご確認ください。",
+  },
+  {
+    q: "どこいくで直接予約できますか?",
+    a: "どこいくは日付・距離を起点にホテルを検索・比較するためのサービスです。実際の予約は提携先の楽天トラベルのページで行います。",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ_ITEMS.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.a,
+    },
+  })),
+};
 
 export default function Home() {
   return (
@@ -25,8 +54,19 @@ function HomeContent() {
   const prefillRegion: RegionKey | undefined = prefillCode
     ? regionKeyForPrefecture(prefillCode)
     : undefined;
+  const prefillBandParam = searchParams.get("band");
+  const prefillBand: TravelBand | undefined =
+    prefillBandParam === "shortTrip" || prefillBandParam === "farTrip"
+      ? prefillBandParam
+      : undefined;
   const prefillCheckin = searchParams.get("checkin") ?? undefined;
   const prefillCheckout = searchParams.get("checkout") ?? undefined;
+  const prefillMode = prefillRegion ? "region" : prefillBand ? "band" : undefined;
+
+  // 「こんな時に」カードから遷移してきた際、実際に検索フォームまでスクロールして
+  // 気づいてもらえるようにする(2026-08-14、IA改善提案への対応)。
+  const weekend = thisWeekendRange();
+  const tomorrow = tomorrowRange();
 
   const [hotels, setHotels] = useState<HotelResult[]>([]);
   const [originLabel, setOriginLabel] = useState<string>();
@@ -152,14 +192,21 @@ function HomeContent() {
         </div>
       </header>
 
-      <SearchForm
-        onSearch={handleSearch}
-        loading={loading}
-        initialMode={prefillRegion ? "region" : undefined}
-        initialRegion={prefillRegion}
-        initialCheckinDate={prefillCheckin}
-        initialCheckoutDate={prefillCheckout}
-      />
+      <div id="search-form">
+        <SearchForm
+          // 「こんな時に」カードは同一ページ("/")内でクエリだけ変えて遷移するため、
+          // keyを付けないとReactがコンポーネントを再マウントせず、useStateの初期値
+          // (initialCheckinDate等)が更新後の値に反映されない(2026-08-14に実機検証で発覚)。
+          key={searchParams.toString()}
+          onSearch={handleSearch}
+          loading={loading}
+          initialMode={prefillMode}
+          initialRegion={prefillRegion}
+          initialBand={prefillBand}
+          initialCheckinDate={prefillCheckin}
+          initialCheckoutDate={prefillCheckout}
+        />
+      </div>
 
       <section className="mt-8">
         {error && (
@@ -281,16 +328,81 @@ function HomeContent() {
         </ol>
       </section>
 
-      <section className="mt-10 mb-4">
+      <section className="mt-10">
         <h2 className="font-display font-bold text-xl text-ink mb-4">
           こんな時に
         </h2>
-        <ul className="text-sub text-sm font-body leading-relaxed list-disc pl-5 space-y-1">
-          <li>週末や連休の予定が直前まで決まっていないとき、空いている日程から旅先を考えたい</li>
-          <li>出張や帰省のついでに、決まった日程で近隣エリアの宿を安く探したい</li>
-          <li>特定の1軒にこだわらず、価格が安い宿を優先して選びたい</li>
-        </ul>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Link
+            href={`/?checkin=${weekend.checkinDate}&checkout=${weekend.checkoutDate}#search-form`}
+            className="block rounded-2xl border border-line bg-surface p-4 hover:border-accent hover:bg-accentSoft transition"
+          >
+            <p className="text-2xl mb-2" aria-hidden="true">🗓️</p>
+            <p className="font-body font-semibold text-sm text-ink mb-1">
+              週末の予定がまだ決まっていない
+            </p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              行き先を決める前に、今週末空いている日程から旅先を考えたい時に。タップで今週末の日程を入力します。
+            </p>
+          </Link>
+          <Link
+            href={`/?checkin=${tomorrow.checkinDate}&checkout=${tomorrow.checkoutDate}&band=shortTrip#search-form`}
+            className="block rounded-2xl border border-line bg-surface p-4 hover:border-accent hover:bg-accentSoft transition"
+          >
+            <p className="text-2xl mb-2" aria-hidden="true">💼</p>
+            <p className="font-body font-semibold text-sm text-ink mb-1">
+              出張や帰省のついでに
+            </p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              日程は決まっているが行き先の候補は絞れていない時に。タップで明日の日程・小旅行圏(〜250km)を入力します。
+            </p>
+          </Link>
+          <Link
+            href="/#search-form"
+            className="block rounded-2xl border border-line bg-surface p-4 hover:border-accent hover:bg-accentSoft transition"
+          >
+            <p className="text-2xl mb-2" aria-hidden="true">💴</p>
+            <p className="font-body font-semibold text-sm text-ink mb-1">
+              1軒にこだわらず、安さ優先で
+            </p>
+            <p className="text-sub text-xs font-body leading-relaxed">
+              特定のホテルではなく、条件に合う中で価格が安い宿を優先して選びたい時に。安い順表示が標準です。
+            </p>
+          </Link>
+        </div>
       </section>
+
+      {/* IA改善提案(2026-08-14)への対応:「行き先を決めずに予約」という逆転した
+          行動フローへの心理的不安に先回りして答えるFAQセクション */}
+      <section className="mt-10 mb-4">
+        <h2 className="font-display font-bold text-xl text-ink mb-4">
+          よくある質問
+        </h2>
+        <div className="flex flex-col gap-3">
+          {FAQ_ITEMS.map((item) => (
+            <details
+              key={item.q}
+              className="rounded-2xl border border-line bg-surface p-4 group"
+            >
+              <summary className="font-body font-semibold text-sm text-ink cursor-pointer list-none flex items-center justify-between gap-2">
+                {item.q}
+                <span className="text-sub text-xs font-mono shrink-0 group-open:rotate-180 transition-transform">
+                  ▼
+                </span>
+              </summary>
+              <p className="text-sub text-xs font-body leading-relaxed mt-2">
+                {item.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     </main>
   );
 }

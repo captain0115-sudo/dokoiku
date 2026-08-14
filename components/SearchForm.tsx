@@ -32,6 +32,7 @@ export default function SearchForm({
   loading,
   initialMode,
   initialRegion,
+  initialBand,
   initialCheckinDate,
   initialCheckoutDate,
 }: {
@@ -39,6 +40,7 @@ export default function SearchForm({
   loading: boolean;
   initialMode?: RangeMode;
   initialRegion?: RegionKey;
+  initialBand?: TravelBand;
   initialCheckinDate?: string;
   initialCheckoutDate?: string;
 }) {
@@ -47,7 +49,7 @@ export default function SearchForm({
   const [checkoutDate, setCheckoutDate] = useState(initialCheckoutDate ?? "");
   const [activePreset, setActivePreset] = useState<string | null>(null);
   const [mode, setMode] = useState<RangeMode>(initialMode ?? "none");
-  const [band, setBand] = useState<TravelBand>("shortTrip");
+  const [band, setBand] = useState<TravelBand>(initialBand ?? "shortTrip");
   const [region, setRegion] = useState<RegionKey>(initialRegion ?? "kanto");
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   const [adults, setAdults] = useState(1);
