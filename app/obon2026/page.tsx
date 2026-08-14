@@ -2,19 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import HotelCard from "@/components/HotelCard";
+import ObonAreaRetry from "@/components/ObonAreaRetry";
 import ShareButtons from "@/components/ShareButtons";
 import { findPrefecture, type Prefecture } from "@/lib/prefectures";
 import { searchVacantHotelsByArea, type HotelResult } from "@/lib/rakuten";
 import { runWithConcurrencyLimit } from "@/lib/concurrency";
-import { nightsBetween } from "@/lib/dates";
+import { nightsBetween, resolvePastDateRange } from "@/lib/dates";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
 
 // お盆休みの代表的な期間として「月遅れ盆」の8/13〜8/16(2026年)を採用。
 // 実際の休暇期間は会社・地域により異なるため、本文中でもその旨を明記している。
-const CHECKIN_DATE = "2026-08-13";
-const CHECKOUT_DATE = "2026-08-16";
+// タイトル・meta descriptionはこのテーマ日付を使うが、実際の検索には
+// resolvePastDateRange()で「今日」以降にスライドさせた日付を使う
+// (このテーマ日付が過去になると楽天APIが全件エラーになるため。2026-08-14発覚)。
+const THEME_CHECKIN_DATE = "2026-08-13";
+const THEME_CHECKOUT_DATE = "2026-08-16";
 
 // 都市・温泉地・避暑地・海と、行き先の傾向が偏らないよう編集部で選定した6エリア。
 // 「人気ランキング」等の裏付けのない順位付けはせず、五十音・地方順ではなく
@@ -51,6 +55,9 @@ type AreaSection = {
 };
 
 export default async function Obon2026Page() {
+  const { checkinDate: CHECKIN_DATE, checkoutDate: CHECKOUT_DATE } =
+    resolvePastDateRange(THEME_CHECKIN_DATE, THEME_CHECKOUT_DATE);
+
   const prefectures = FEATURED_CODES.map((code) => findPrefecture(code)).filter(
     (p): p is Prefecture => p !== undefined
   );
@@ -180,6 +187,13 @@ export default async function Obon2026Page() {
         現在空室のあるホテルを価格の安い順にまとめました。掲載しているのは実際に取得できた
         空室のみです。ご自身の日程・行き先で探したい場合は、下のボタンからトップページの
         検索フォームをお使いください(このページの日付が自動で入力された状態で開きます)。
+        {CHECKIN_DATE !== THEME_CHECKIN_DATE && (
+          <>
+            <br />
+            ※{THEME_CHECKIN_DATE}は既に過去の日付のため、実際の検索条件は
+            {CHECKIN_DATE}〜{CHECKOUT_DATE}に自動で切り替えています。
+          </>
+        )}
       </p>
 
       <div className="mb-10 flex flex-wrap items-center gap-3">
@@ -213,9 +227,11 @@ export default async function Obon2026Page() {
           </div>
 
           {fetchFailed && (
-            <p className="text-sub font-body text-xs bg-surface border border-line rounded-xl p-4">
-              現在、{pref.name}の空室情報を取得できませんでした。しばらくしてから再度お試しください。
-            </p>
+            <ObonAreaRetry
+              areaCode={pref.middleClassCode}
+              prefName={pref.name}
+              nights={nights}
+            />
           )}
 
           {!fetchFailed && hotels.length === 0 && (

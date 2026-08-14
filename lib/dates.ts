@@ -45,6 +45,29 @@ export function tomorrowRange(now = new Date()): DateRange {
 }
 
 /**
+ * 特集ページ等で固定の日付(例: "2026-08-13")を使う場合、時間経過でその日付が
+ * 過去になると楽天APIが「specify valid checkinDate」で全件エラーになる
+ * (2026-08-14、/obon2026で実際に全エリア機能不全になる事象で発覚)。
+ * チェックイン日が過去になっていたら、宿泊数を保ったまま「今日」までスライドさせる
+ * ことで、期限管理を忘れても恒久的に壊れないようにする。
+ */
+export function resolvePastDateRange(
+  checkinDate: string,
+  checkoutDate: string,
+  now = new Date()
+): DateRange {
+  const todayStr = toDateString(now);
+  if (checkinDate >= todayStr) {
+    return { checkinDate, checkoutDate };
+  }
+  const nights = nightsBetween(checkinDate, checkoutDate);
+  return {
+    checkinDate: todayStr,
+    checkoutDate: toDateString(addDays(now, nights)),
+  };
+}
+
+/**
  * 今週末(直近の土曜チェックイン・日曜チェックアウト)。
  * 今日が土曜/日曜の場合は今日を起点にする。
  */
