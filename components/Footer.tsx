@@ -27,7 +27,7 @@ export default function Footer() {
             href="/obon2026"
             className="text-sub text-xs font-body underline hover:text-ink"
           >
-            お盆休み2026の空室ホテル特集
+            夏休み後半の空室ホテル特集
           </Link>
         </div>
 

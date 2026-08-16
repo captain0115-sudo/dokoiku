@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "どこいく | お盆休み2026の空室ホテル特集";
+export const alt = "どこいく | 夏休み後半の空室ホテル特集";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -41,10 +41,10 @@ export default function Obon2026OpengraphImage() {
             marginTop: 32,
           }}
         >
-          お盆休み2026の空室ホテル特集
+          夏休み後半の空室ホテル特集
         </div>
         <div style={{ fontSize: 28, color: "#6B7680", marginTop: 20 }}>
-          8月13日〜16日を例に、6エリアの空室を価格順に
+          8月22日〜24日を例に、6エリアの空室を価格順に
         </div>
         <div style={{ fontSize: 22, color: "#0E7C66", marginTop: 32 }}>
           行き先じゃなく、日付から探すホテル検索

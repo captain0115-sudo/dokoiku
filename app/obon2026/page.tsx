@@ -12,13 +12,14 @@ import { nightsBetween, resolvePastDateRange } from "@/lib/dates";
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
 
-// お盆休みの代表的な期間として「月遅れ盆」の8/13〜8/16(2026年)を採用。
-// 実際の休暇期間は会社・地域により異なるため、本文中でもその旨を明記している。
+// お盆(8/13〜8/16)は終了したため、2026-08-16にテーマを「夏休み後半」に切り替え。
+// 8月最終週の週末(8/22土〜8/24月)を代表例として採用。実際の休暇期間は人により
+// 異なるため、本文中でもその旨を明記している。
 // タイトル・meta descriptionはこのテーマ日付を使うが、実際の検索には
 // resolvePastDateRange()で「今日」以降にスライドさせた日付を使う
 // (このテーマ日付が過去になると楽天APIが全件エラーになるため。2026-08-14発覚)。
-const THEME_CHECKIN_DATE = "2026-08-13";
-const THEME_CHECKOUT_DATE = "2026-08-16";
+const THEME_CHECKIN_DATE = "2026-08-22";
+const THEME_CHECKOUT_DATE = "2026-08-24";
 
 // 都市・温泉地・避暑地・海と、行き先の傾向が偏らないよう編集部で選定した6エリア。
 // 「人気ランキング」等の裏付けのない順位付けはせず、五十音・地方順ではなく
@@ -37,14 +38,14 @@ const FEATURED_CODES = [
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "お盆休み2026(8/13〜8/16)の空室ホテル特集 | どこいく",
+  title: "夏休み後半(8/22〜8/24)の空室ホテル特集 | どこいく",
   description:
-    "2026年のお盆休み(8月13日〜16日を例に)、北海道・東京・神奈川・静岡・大阪・沖縄で今空いているホテルを価格順にまとめました。日付から探すホテル検索「どこいく」。",
+    "2026年の夏休み後半(8月22日〜24日を例に)、北海道・東京・神奈川・静岡・大阪・沖縄で今空いているホテルを価格順にまとめました。日付から探すホテル検索「どこいく」。",
   alternates: { canonical: "/obon2026" },
   openGraph: {
-    title: "お盆休み2026の空室ホテル特集 | どこいく",
+    title: "夏休み後半の空室ホテル特集 | どこいく",
     description:
-      "北海道・東京・神奈川・静岡・大阪・沖縄で、お盆休み(8/13〜8/16)に今空いているホテルを価格順に一覧表示。",
+      "北海道・東京・神奈川・静岡・大阪・沖縄で、夏休み後半(8/22〜8/24)に今空いているホテルを価格順に一覧表示。",
   },
 };
 
@@ -105,7 +106,7 @@ export default async function Obon2026Page() {
       {
         "@type": "ListItem",
         position: 2,
-        name: "お盆休み2026の空室ホテル特集",
+        name: "夏休み後半の空室ホテル特集",
         item: pageUrl,
       },
     ],
@@ -179,14 +180,14 @@ export default async function Obon2026Page() {
         {CHECKIN_DATE} 〜 {CHECKOUT_DATE}({nights}泊)の例
       </p>
       <h1 className="font-display font-black text-3xl text-ink mb-3">
-        お盆休み2026の空室ホテル特集
+        夏休み後半の空室ホテル特集
       </h1>
       <p className="text-sub font-body text-sm leading-relaxed mb-8">
-        お盆休みの期間は会社・地域によって異なりますが、ここでは「月遅れ盆」にあたる
-        2026年8月13日〜16日を例に、北海道・東京・神奈川・静岡・大阪・沖縄の6エリアで
-        現在空室のあるホテルを価格の安い順にまとめました。掲載しているのは実際に取得できた
-        空室のみです。ご自身の日程・行き先で探したい場合は、下のボタンからトップページの
-        検索フォームをお使いください(このページの日付が自動で入力された状態で開きます)。
+        夏休みも後半戦。ここでは8月最終週の週末にあたる2026年8月22日〜24日を例に、
+        北海道・東京・神奈川・静岡・大阪・沖縄の6エリアで現在空室のあるホテルを価格の
+        安い順にまとめました。掲載しているのは実際に取得できた空室のみです。ご自身の
+        日程・行き先で探したい場合は、下のボタンからトップページの検索フォームを
+        お使いください(このページの日付が自動で入力された状態で開きます)。
         {CHECKIN_DATE !== THEME_CHECKIN_DATE && (
           <>
             <br />
@@ -205,7 +206,7 @@ export default async function Obon2026Page() {
         </Link>
         <ShareButtons
           url={pageUrl}
-          text="お盆休み2026の空室ホテル特集 | どこいく"
+          text="夏休み後半の空室ホテル特集 | どこいく"
         />
       </div>
 

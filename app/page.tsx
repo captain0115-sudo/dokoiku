@@ -187,7 +187,7 @@ function HomeContent() {
             href="/obon2026"
             className="inline-flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-white/70 border border-line text-ink text-xs font-mono font-semibold hover:bg-white transition"
           >
-            🎋 季節特集: お盆休み2026(8/13〜8/16)の空室ホテルを見る
+            🌻 季節特集: 夏休み後半(8/22〜8/24)の空室ホテルを見る
           </Link>
         </div>
       </header>

@@ -24,7 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      // 期間限定の季節特集ページ。お盆休み(2026/8/13〜8/16)を過ぎたら
+      // 期間限定の季節特集ページ。2026-08-16にお盆休み(8/13〜8/16)テーマから
+      // 夏休み後半(8/22〜8/24)テーマに切り替え済み。このテーマも過ぎたら
       // 内容の見直し・削除を検討すること(sitemap.tsのコメント参照)。
       url: `${baseUrl}/obon2026`,
       lastModified: new Date(),

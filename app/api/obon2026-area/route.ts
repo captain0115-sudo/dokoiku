@@ -12,8 +12,8 @@ import { resolvePastDateRange } from "@/lib/dates";
 
 // /obon2026本体と同じテーマ日付・同じ「過去日付なら今日にスライド」ロジックを使う
 // (片方だけ直しても、もう片方が過去日付のままだと同じ理由で全滅するため)。
-const THEME_CHECKIN_DATE = "2026-08-13";
-const THEME_CHECKOUT_DATE = "2026-08-16";
+const THEME_CHECKIN_DATE = "2026-08-22";
+const THEME_CHECKOUT_DATE = "2026-08-24";
 const ALLOWED_CODES = [
   "hokkaido",
   "tokyo",
