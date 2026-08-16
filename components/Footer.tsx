@@ -53,6 +53,36 @@ export default function Footer() {
           </div>
         </div>
 
+        <div>
+          <p className="text-sub text-xs font-mono mb-2">運営者について</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <a
+              href="https://note.com/proper_clover730"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sub text-xs font-body underline hover:text-ink"
+            >
+              運営者のnote(副業・個人開発の話)
+            </a>
+            <a
+              href="https://www.instagram.com/dokoiku_jp/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sub text-xs font-body underline hover:text-ink"
+            >
+              Instagram(@dokoiku_jp)
+            </a>
+            <a
+              href="https://room.rakuten.co.jp/room_1b6167f7c7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sub text-xs font-body underline hover:text-ink"
+            >
+              楽天ROOM
+            </a>
+          </div>
+        </div>
+
         <p className="text-sub text-xs font-body">
           【PR】本サイトは楽天アフィリエイトプログラムに参加しており、
           掲載する宿泊施設へのリンクから成果報酬を受け取る場合があります。
