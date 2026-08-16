@@ -199,7 +199,12 @@ export default async function AreaVariantPage({ code, variant }: Props) {
           </div>
           <div className="px-3 divide-y divide-line">
             {hotels.map((hotel) => (
-              <HotelCard key={hotel.hotelNo} hotel={hotel} nights={nights} />
+              <HotelCard
+                key={hotel.hotelNo}
+                hotel={hotel}
+                nights={nights}
+                distanceLabel={`${pref.name}の中心部から`}
+              />
             ))}
           </div>
         </div>

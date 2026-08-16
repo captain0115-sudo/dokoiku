@@ -8,10 +8,17 @@ export default function HotelCard({
   hotel,
   highlighted,
   nights = 1,
+  distanceLabel = "自宅から",
 }: {
   hotel: HotelResult;
   highlighted?: boolean;
   nights?: number;
+  /**
+   * 距離の基準点のラベル。エリアページ・季節特集ページでは実際のユーザーの自宅ではなく
+   * 都道府県の代表地点を基準にしているため、呼び出し側で正しい文言を渡すこと
+   * (「自宅から」のまま放置すると、検索結果のスニペットにも表示され意味不明になる)。
+   */
+  distanceLabel?: string;
 }) {
   const total = hotel.hotelMinCharge * nights;
 
@@ -54,7 +61,7 @@ export default function HotelCard({
           {hotel.hotelName}
         </p>
         <p className="text-sub text-xs font-mono tabnum mt-1">
-          自宅から {hotel.distanceKm.toFixed(0)} km ・{" "}
+          {distanceLabel} {hotel.distanceKm.toFixed(0)} km ・{" "}
           {hotel.reviewAverage != null
             ? `評価 ${hotel.reviewAverage.toFixed(1)}`
             : "評価なし"}

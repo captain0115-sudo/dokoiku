@@ -60,7 +60,12 @@ export default function ObonAreaRetry({
     <div className="bg-surface border border-line rounded-2xl overflow-hidden shadow-sm">
       <div className="px-3 divide-y divide-line">
         {hotels.map((hotel) => (
-          <HotelCard key={hotel.hotelNo} hotel={hotel} nights={nights} />
+          <HotelCard
+            key={hotel.hotelNo}
+            hotel={hotel}
+            nights={nights}
+            distanceLabel={`${prefName}の中心部から`}
+          />
         ))}
       </div>
     </div>
