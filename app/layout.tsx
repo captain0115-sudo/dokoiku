@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
+const gaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-N4LQJY73L6";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -57,10 +59,14 @@ export default function RootLayout({
         />
         <div className="flex-1">{children}</div>
         <Footer />
-        {/* Vercelホスティング標準のアクセス解析。追加のIDや環境変数設定は不要
-            (GA4はMeasurement IDの取得が必要なため今回は見送り) */}
+        {/* Vercelホスティング標準のアクセス解析。追加のIDや環境変数設定は不要 */}
         <Analytics />
       </body>
+      {/* GA4(Googleマーケティングプラットフォーム)。2026-08-19、ユーザーがGoogle
+          アナリティクスでプロパティ「dokoiku」を作成しMeasurement IDを取得したため導入。
+          @next/third-partiesのGoogleAnalyticsコンポーネントはgtag.jsを最適化した形で
+          読み込む(Next.js公式推奨の実装方法) */}
+      <GoogleAnalytics gaId={gaId} />
     </html>
   );
 }
