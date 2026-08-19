@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+
+export const metadata: Metadata = {
+  title: "ページが見つかりません | どこいく",
+  robots: { index: false, follow: false },
+};
 
 export default function NotFound() {
   return (
