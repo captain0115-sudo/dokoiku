@@ -51,6 +51,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
+      <head>
+        {/* Googleフォントをglobals.cssの@importから移動(2026-08-19)。CSS内@importは
+            レンダリングブロッキングの原因になるため、preconnect+非同期寄りのlink読み込みに変更
+            (PageSpeed Insightsモバイル計測で判明、詳細はどこいく実行済み.md参照) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+        />
+      </head>
       <body className="font-body min-h-screen bg-bg flex flex-col">
         <script
           type="application/ld+json"
