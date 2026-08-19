@@ -44,8 +44,13 @@ const jsonLd = {
   inLanguage: "ja",
 };
 
+// ウェイト削減(2026-08-19): コードベース全体でfont-display(Zen Kaku Gothic New)は
+// font-black(900)/font-bold(700)のみ、font-mono(IBM Plex Mono)はデフォルト(400)/
+// font-semibold(600)のみ使用されており、両者とも500は未使用と確認済みのため除外
+// (PageSpeed Insightsの「使用していないCSSの削減」対策、Noto Sans JPは400/500/600
+// すべて実使用があるため据え置き)
 const googleFontsHref =
-  "https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap";
+  "https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Noto+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap";
 
 export default function RootLayout({
   children,
