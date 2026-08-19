@@ -44,6 +44,9 @@ const jsonLd = {
   inLanguage: "ja",
 };
 
+const googleFontsHref =
+  "https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap";
+
 export default function RootLayout({
   children,
 }: {
@@ -52,15 +55,34 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
-        {/* Googleフォントをglobals.cssの@importから移動(2026-08-19)。CSS内@importは
-            レンダリングブロッキングの原因になるため、preconnect+非同期寄りのlink読み込みに変更
-            (PageSpeed Insightsモバイル計測で判明、詳細はどこいく実行済み.md参照) */}
+        {/* Googleフォントの読み込みを非ブロッキング化(2026-08-19)。当初globals.cssの@importを
+            単純なlink rel="stylesheet"に置き換えたが、それでも175KB・2,730msの
+            レンダリングブロッキングとしてPageSpeed Insightsに検出され続けた(同期的な
+            stylesheetリンクである限り@import/linkどちらでもブロッキングは解消しない)。
+            media="print"で読み込んでrender-blocking対象から外し、読み込み完了後に
+            JSでmedia="all"に切り替える標準手法(loadCSSパターン)に変更。display=swapとの
+            組み合わせで、フォント未読み込み時もテキストは即座にフォールバックフォントで
+            表示される(文字が見えなくなることはない) */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" as="style" href={googleFontsHref} />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          href={googleFontsHref}
+          media="print"
+          id="google-fonts-stylesheet"
         />
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var l=document.getElementById('google-fonts-stylesheet');" +
+              "if(l){l.addEventListener('load',function(){l.media='all';});}})();",
+          }}
+        />
+        <noscript>
+          <link rel="stylesheet" href={googleFontsHref} />
+        </noscript>
       </head>
       <body className="font-body min-h-screen bg-bg flex flex-col">
         <script
