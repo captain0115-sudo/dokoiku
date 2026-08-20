@@ -44,7 +44,7 @@ export default function OpengraphImage() {
           行き先じゃなく、日付から。
         </div>
         <div style={{ fontSize: 24, color: "#6B7680", marginTop: 20 }}>
-          日付と自宅からの範囲で、今空いているホテルを価格順に見つけます。
+          日付と起点からの範囲で、今空いているホテルを価格順に見つけます。
         </div>
       </div>
     ),

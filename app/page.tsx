@@ -7,7 +7,7 @@ import { thisWeekendRange, tomorrowRange } from "@/lib/dates";
 const FAQ_ITEMS = [
   {
     q: "行き先を決めずに検索して大丈夫ですか?",
-    a: "検索結果ではホテル名・写真・口コミ評価・自宅からの距離を確認してから選べます。自動で予約されることはなく、実際に泊まるホテルは表示された候補の中から自分で選んで予約ページに進む形です。",
+    a: "検索結果ではホテル名・写真・口コミ評価・起点からの距離を確認してから選べます。自動で予約されることはなく、実際に泊まるホテルは表示された候補の中から自分で選んで予約ページに進む形です。",
   },
   {
     q: "表示されている価格は本当にその金額で泊まれますか?",
@@ -64,7 +64,7 @@ export default function Home() {
             日付から。
           </h1>
           <p className="text-sub mt-4 font-body text-sm md:text-base max-w-md">
-            日付と自宅からの範囲で、今空いているホテルを価格順に見つけます。
+            日付と起点からの範囲で、今空いているホテルを価格順に見つけます。
           </p>
           <Link
             href="/obon2026"
@@ -112,10 +112,10 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border border-line bg-surface p-4">
             <p className="font-body font-semibold text-sm text-ink mb-1">
-              自宅からの範囲・地方で絞り込み
+              起点からの範囲・地方で絞り込み
             </p>
             <p className="text-sub text-xs font-body leading-relaxed">
-              自宅から◯km圏内、または地方単位(関東・関西など)で検索範囲を指定できます。複数エリアの空室を一度に比較できます。
+              起点から◯km圏内、または地方単位(関東・関西など)で検索範囲を指定できます。複数エリアの空室を一度に比較できます。
             </p>
           </div>
         </div>
@@ -135,7 +135,7 @@ export default function Home() {
           <li className="rounded-2xl border border-line bg-surface p-4">
             <p className="font-mono text-xs text-accent mb-1">STEP 2</p>
             <p className="text-sub text-xs font-body leading-relaxed">
-              行き先の範囲(自宅からの距離、または地方)を必要に応じて指定します。
+              行き先の範囲(起点からの距離、または地方)を必要に応じて指定します。
             </p>
           </li>
           <li className="rounded-2xl border border-line bg-surface p-4">

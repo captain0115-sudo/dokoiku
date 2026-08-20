@@ -238,7 +238,7 @@ export default function SearchForm({
 
         {mode === "none" && (
           <p className="text-sub text-xs font-body">
-            自宅からある程度離れた(80km〜)エリアを中心に、幅広く空室を探します。
+            起点からある程度離れた(80km〜)エリアを中心に、幅広く空室を探します。
           </p>
         )}
 
