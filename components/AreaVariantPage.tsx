@@ -66,6 +66,13 @@ export default async function AreaVariantPage({ code, variant }: Props) {
       filters: variant.filters,
     });
     hotels.sort((a, b) => a.hotelMinCharge - b.hotelMinCharge);
+    // 「◯円以下」を明示するバリエーション(例: budget)では、楽天APIのmaxCharge
+    // フィルタ基準(1部屋あたりの目安額)と実際に表示する金額(人数条件に
+    // 一致した実料金)が乖離することがあるため、実際に表示する金額の側でも
+    // 再度絞り込み、誇大な表示を防ぐ(lib/areaVariants.ts の maxDisplayCharge参照)。
+    if (variant.maxDisplayCharge != null) {
+      hotels = hotels.filter((h) => h.hotelMinCharge <= variant.maxDisplayCharge!);
+    }
     hotels = hotels.slice(0, 15);
   } catch {
     fetchFailed = true;

@@ -8,7 +8,7 @@ import { thisWeekendRange, tonightRange, type DateRange } from "./dates";
  * それぞれ別URL(/areas/[code]、/areas/[code]/onsen、/areas/[code]/tonight)で
  * インデックスさせる。
  */
-export type AreaVariantKey = "weekend" | "onsen" | "tonight";
+export type AreaVariantKey = "weekend" | "onsen" | "tonight" | "budget";
 
 export type AreaVariant = {
   key: AreaVariantKey;
@@ -23,6 +23,14 @@ export type AreaVariant = {
   buildIntroExtra: (prefName: string) => string;
   dateRange: () => DateRange;
   filters?: SearchFilters;
+  /**
+   * 表示時に追加で適用する上限金額(円)。
+   * 楽天APIのmaxChargeフィルタは「1部屋あたりの目安額」基準で判定されており、
+   * 実際に表示する金額(人数条件に一致した実料金、2026-08-13対応)とは
+   * 乖離することがある(実測で最大2倍程度)。「◯円以下」と明示するページでは
+   * 実際に表示する金額の側でも再度絞り込み、誇大な表示を防ぐ。
+   */
+  maxDisplayCharge?: number;
   emptyMessage: string;
 };
 
@@ -65,6 +73,21 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
       `急な出張や弾丸旅行にも対応できるよう、今日チェックイン・翌日チェックアウトの条件で${name}内の直前予約可能な宿を探せます。`,
     dateRange: tonightRange,
     emptyMessage: "本日チェックインの条件では、空室が見つかりませんでした。",
+  },
+  budget: {
+    key: "budget",
+    pathSuffix: "/budget",
+    navLabel: "1万円以下の宿だけ探す",
+    buildTitle: (name, catchphrase) => `${name}の格安ホテル 1万円以下の空室状況 | どこいく`,
+    buildDescription: (name, catchphrase) =>
+      `${catchphrase}が魅力の${name}で、1泊1万円以下の予算重視ホテルだけを価格順に一覧表示。日付を指定した検索もできます。`,
+    buildHeading: (name) => `${name}の格安ホテル(1万円以下)`,
+    buildIntroExtra: (name) =>
+      `こちらは1泊あたり1万円以下という予算条件で絞り込んだ結果で、${name}内の指定人数での実料金が1万円以下の宿泊施設のみを表示しています。`,
+    dateRange: thisWeekendRange,
+    filters: { maxCharge: 10000 },
+    maxDisplayCharge: 10000,
+    emptyMessage: "この日程では、1万円以下の条件に合う空室が見つかりませんでした。",
   },
 };
 
