@@ -297,6 +297,17 @@ function clampSearchRadius(km: number): number {
  * (f_nen/f_tuki/f_hi = 年/月/日、f_otona_su = 大人数、f_heya_su = 部屋数)。
  * 子供・幼児の内訳(f_s1/f_s2, f_y1〜y4)は公開ドキュメントがなく、
  * 観測されたURL例からの推測のため、ズレる可能性がある点はご了承ください。
+ *
+ * 【2026-08-25修正】planListUrlは`https://hb.afl.rakuten.co.jp/hgc/{affiliateId}/
+ * ?pc={実際の遷移先URLをエンコードしたもの}`という楽天アフィリエイトのディープリンク
+ * 形式になっている。実際にリンクを辿って検証したところ、hb.afl.rakuten.co.jpの
+ * リダイレクタは`pc=`パラメータの中身しか転送せず、その外側にトップレベルの
+ * クエリを追加しても遷移先には一切伝わらないことを確認した(以前の実装は
+ * `new URL(baseUrl)`に対して直接f_nen1等を追加していたため、日付・人数が
+ * 常に失われ、ユーザーは条件未指定の一般プラン一覧に着地していた)。
+ * そのため、`pc=`が存在する場合はその中の実URLに対してパラメータを付与し、
+ * 再エンコードして`pc=`に書き戻す。存在しない場合(直接のtravel.rakuten.co.jp
+ * URL等)は従来通りbaseUrl自体に直接付与する。
  */
 function buildPlanUrl(
   baseUrl: string,
@@ -305,27 +316,34 @@ function buildPlanUrl(
   guests: GuestCounts | undefined
 ): string {
   try {
-    const url = new URL(baseUrl);
+    const outer = new URL(baseUrl);
+    const pcValue = outer.searchParams.get("pc");
+    const target = pcValue ? new URL(pcValue) : outer;
+
     const [y1, m1, d1] = checkinDate.split("-");
     const [y2, m2, d2] = checkoutDate.split("-");
 
-    url.searchParams.set("f_nen1", y1);
-    url.searchParams.set("f_tuki1", String(Number(m1)));
-    url.searchParams.set("f_hi1", String(Number(d1)));
-    url.searchParams.set("f_nen2", y2);
-    url.searchParams.set("f_tuki2", String(Number(m2)));
-    url.searchParams.set("f_hi2", String(Number(d2)));
-    url.searchParams.set("f_otona_su", String(guests?.adults ?? 1));
-    url.searchParams.set("f_heya_su", String(guests?.rooms ?? 1));
+    target.searchParams.set("f_nen1", y1);
+    target.searchParams.set("f_tuki1", String(Number(m1)));
+    target.searchParams.set("f_hi1", String(Number(d1)));
+    target.searchParams.set("f_nen2", y2);
+    target.searchParams.set("f_tuki2", String(Number(m2)));
+    target.searchParams.set("f_hi2", String(Number(d2)));
+    target.searchParams.set("f_otona_su", String(guests?.adults ?? 1));
+    target.searchParams.set("f_heya_su", String(guests?.rooms ?? 1));
     // 子供(小学生)・幼児は推測ベースのため、0件のときは触らずデフォルトのまま
     if (guests?.children) {
-      url.searchParams.set("f_s2", String(guests.children));
+      target.searchParams.set("f_s2", String(guests.children));
     }
     if (guests?.infants) {
-      url.searchParams.set("f_y3", String(guests.infants));
+      target.searchParams.set("f_y3", String(guests.infants));
     }
 
-    return url.toString();
+    if (pcValue) {
+      outer.searchParams.set("pc", target.toString());
+      return outer.toString();
+    }
+    return target.toString();
   } catch {
     // URLとして不正な場合は加工せずそのまま返す
     return baseUrl;
