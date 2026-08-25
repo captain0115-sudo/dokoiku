@@ -24,10 +24,10 @@ export default function Footer() {
         <div>
           <p className="text-sub text-xs font-mono mb-2">特集</p>
           <Link
-            href="/obon2026"
+            href="/silverweek2026"
             className="text-sub text-xs font-body underline hover:text-ink"
           >
-            夏休み後半の空室ホテル特集
+            11年ぶりのシルバーウィーク空室ホテル特集
           </Link>
         </div>
 

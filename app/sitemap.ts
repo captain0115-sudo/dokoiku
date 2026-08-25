@@ -25,9 +25,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       // 期間限定の季節特集ページ。2026-08-16にお盆休み(8/13〜8/16)テーマから
-      // 夏休み後半(8/22〜8/24)テーマに切り替え済み。このテーマも過ぎたら
-      // 内容の見直し・削除を検討すること(sitemap.tsのコメント参照)。
-      url: `${baseUrl}/obon2026`,
+      // 夏休み後半(8/22〜8/24)テーマに切り替え、2026-08-25に夏休み終了を受けて
+      // 新規ページ/silverweek2026(9/19〜23の5連休)へ切り替えた。旧/obon2026は
+      // 内部リンクを外したがページ自体は残す(既存インデックス・被リンクの維持)。
+      // このテーマも過ぎたら内容の見直し・削除を検討すること。
+      url: `${baseUrl}/silverweek2026`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.8,
