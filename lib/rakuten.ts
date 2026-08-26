@@ -272,6 +272,24 @@ async function fetchWithRetry(
       await sleep(300);
       return fetchWithRetry(url, headers, retriesLeft - 1);
     }
+    // 【2026-08-26修正】squeezeCondition(温泉宿のみ等)で絞り込んだ際、該当施設が
+    // そのエリアに1件も無い場合、楽天トラベルAPIはエラーではなく404
+    // {"error":"not_found","error_description":"Data Not Found"}を返す仕様と判明
+    // (Xユーザーからの実際の不具合報告を受けて実地検証、東北地方+温泉宿のみで複数回
+    // 再現。失敗する県は毎回異なり、「単にその条件に合う宿が無かっただけ」という
+    // 挙動と一致する)。これを他の本物のエラー(401/403/5xx等)と同じ扱いで例外に
+    // していたため、生のJSONエラーがそのままユーザー向けUIに表示されてしまっていた。
+    // 「0件」として扱い、hotelsキー無しのオブジェクトを返す(searchVacantHotelsByArea
+    // 側の`if (!data.hotels) return [];`によって正常に空配列として処理される)。
+    let errorCode: string | undefined;
+    try {
+      errorCode = JSON.parse(body)?.error;
+    } catch {
+      // JSONで無ければそのまま下のthrowに進む
+    }
+    if (res.status === 404 && errorCode === "not_found") {
+      return {};
+    }
     throw new Error(`Rakuten API error (${res.status}): ${body}`);
   }
 
