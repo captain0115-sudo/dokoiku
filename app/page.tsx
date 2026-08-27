@@ -4,6 +4,20 @@ import Logo from "@/components/Logo";
 import HomeSearch from "@/components/HomeSearch";
 import { thisWeekendRange, tomorrowRange } from "@/lib/dates";
 
+// SEO監査(2026-08-28)で判明: フッターは47都道府県の「通常(週末)」ページのみにリンクしており、
+// 温泉宿限定(onsen)・今夜泊まれる宿(tonight)・1万円以下(budget)の3バリエーション(計141ページ)は
+// トップページから直接たどり着けず、都道府県ページ内の「他の探し方」経由でしか発見できなかった
+// (ホームページ直下からのリンクが無いとcrawlされにくい)。主要エリアの組み合わせを
+// トップページに追加し、ホームから1クリックで到達できるようにする。
+const POPULAR_VARIANT_LINKS = [
+  { href: "/areas/tokyo/onsen", label: "東京都の温泉宿" },
+  { href: "/areas/osaka/tonight", label: "大阪府で今夜泊まれる宿" },
+  { href: "/areas/okinawa/budget", label: "沖縄県の格安ホテル(1万円以下)" },
+  { href: "/areas/hokkaido/onsen", label: "北海道の温泉宿" },
+  { href: "/areas/kyoto/tonight", label: "京都府で今夜泊まれる宿" },
+  { href: "/areas/fukuoka/budget", label: "福岡県の格安ホテル(1万円以下)" },
+];
+
 const FAQ_ITEMS = [
   {
     q: "行き先を決めずに検索して大丈夫ですか?",
@@ -188,6 +202,23 @@ export default function Home() {
               特定のホテルではなく、条件に合う中で価格が安い宿を優先して選びたい時に。安い順表示が標準です。
             </p>
           </Link>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-display font-bold text-xl text-ink mb-4">
+          人気の探し方
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {POPULAR_VARIANT_LINKS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="pill-button pill-button-inactive text-xs"
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       </section>
 
