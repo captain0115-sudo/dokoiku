@@ -16,7 +16,7 @@ export type AreaVariant = {
   pathSuffix: string;
   /** 「他の探し方」ナビに出す短いラベル */
   navLabel: string;
-  buildTitle: (prefName: string, catchphrase: string) => string;
+  buildTitle: (prefName: string) => string;
   buildDescription: (prefName: string, catchphrase: string) => string;
   buildHeading: (prefName: string) => string;
   /** 通常の紹介文に足す一文(このバリエーション特有の説明)。無ければ空文字 */
@@ -39,9 +39,9 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     key: "weekend",
     pathSuffix: "",
     navLabel: "週末の空室(通常)",
-    buildTitle: (name, catchphrase) => `${name}のホテル空室状況(${catchphrase}) | どこいく`,
+    buildTitle: (name) => `${name}の空室ホテル一覧｜今すぐ・価格が安い順 - どこいく`,
     buildDescription: (name, catchphrase) =>
-      `${catchphrase}が魅力の${name}で、今空いているホテルを価格順に一覧表示。日付を指定して、行き先を${name}に限定した検索もできます。`,
+      `${name}で今空いているホテルを価格が安い順に一覧表示。日付を指定して、行き先を${name}に限定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}のホテル空室状況`,
     buildIntroExtra: () => "",
     dateRange: thisWeekendRange,
@@ -51,9 +51,9 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     key: "onsen",
     pathSuffix: "/onsen",
     navLabel: "温泉宿だけ探す",
-    buildTitle: (name, catchphrase) => `${name}の温泉宿 空室状況(${catchphrase}) | どこいく`,
+    buildTitle: (name) => `${name}の温泉宿 空室一覧｜価格が安い順 - どこいく`,
     buildDescription: (name, catchphrase) =>
-      `${catchphrase}が魅力の${name}で、今空いている温泉宿だけを価格順に一覧表示。日付を指定した検索もできます。`,
+      `${name}で今空いている温泉宿だけを価格が安い順に一覧表示。日付を指定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}の温泉宿 空室状況`,
     buildIntroExtra: (name) =>
       `こちらは楽天トラベルの温泉宿条件で絞り込んだ結果で、${name}内の温泉付き宿泊施設のみを表示しています。`,
@@ -65,9 +65,9 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     key: "tonight",
     pathSuffix: "/tonight",
     navLabel: "今夜泊まれる宿(直前予約)",
-    buildTitle: (name, catchphrase) => `${name}で今夜泊まれる宿(直前予約) | どこいく`,
+    buildTitle: (name) => `${name}で今夜泊まれる宿｜直前予約・価格順 - どこいく`,
     buildDescription: (name, catchphrase) =>
-      `${catchphrase}が魅力の${name}で、今夜からすぐ泊まれる空室ホテルを価格順に一覧表示。直前予約・弾丸旅行にも。`,
+      `${name}で今夜からすぐ泊まれる空室ホテルを価格が安い順に一覧表示。直前予約・弾丸旅行にも。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}で今夜泊まれる宿(直前予約)`,
     buildIntroExtra: (name) =>
       `急な出張や弾丸旅行にも対応できるよう、今日チェックイン・翌日チェックアウトの条件で${name}内の直前予約可能な宿を探せます。`,
@@ -78,9 +78,9 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     key: "budget",
     pathSuffix: "/budget",
     navLabel: "1万円以下の宿だけ探す",
-    buildTitle: (name, catchphrase) => `${name}の格安ホテル 1万円以下の空室状況 | どこいく`,
+    buildTitle: (name) => `${name}の格安ホテル｜1万円以下・空室あり - どこいく`,
     buildDescription: (name, catchphrase) =>
-      `${catchphrase}が魅力の${name}で、1泊1万円以下の予算重視ホテルだけを価格順に一覧表示。日付を指定した検索もできます。`,
+      `${name}で1泊1万円以下の予算重視ホテルだけを価格が安い順に一覧表示。日付を指定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}の格安ホテル(1万円以下)`,
     buildIntroExtra: (name) =>
       `こちらは1泊あたり1万円以下という予算条件で絞り込んだ結果で、${name}内の指定人数での実料金が1万円以下の宿泊施設のみを表示しています。`,

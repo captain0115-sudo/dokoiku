@@ -23,7 +23,7 @@ export function buildAreaMetadata(code: string, variant: AreaVariant): Metadata 
   const pref = findPrefecture(code);
   if (!pref) return {};
 
-  const title = variant.buildTitle(pref.name, pref.catchphrase);
+  const title = variant.buildTitle(pref.name);
   const description = variant.buildDescription(pref.name, pref.catchphrase);
 
   return {
