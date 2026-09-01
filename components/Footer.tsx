@@ -54,6 +54,13 @@ export default function Footer() {
         </div>
 
         <div>
+          <p className="text-sub text-xs font-mono mb-2">このサイトを応援する</p>
+          {/* Google公式「優先するニュース提供元」ボタン(2026-09-01導入)。中身はGoogleの
+              publisher.jsが自動描画するため独自スタイルは当てない */}
+          <div {...{ "google-add-preferred-source-btn": "" }} />
+        </div>
+
+        <div>
           <p className="text-sub text-xs font-mono mb-2">運営者について</p>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
             <a

@@ -68,6 +68,11 @@ export default function RootLayout({
             JSでmedia="all"に切り替える標準手法(loadCSSパターン)に変更。display=swapとの
             組み合わせで、フォント未読み込み時もテキストは即座にフォールバックフォントで
             表示される(文字が見えなくなることはない) */}
+        {/* Google公式「優先するニュース提供元」ボタン(2026-09-01導入)。読者がこのサイトを
+            優先ソースとして選択すると、トップニュース欄・AIモード/AI概要で優先的に表示
+            されやすくなる(developers.google.com/search/docs/appearance/preferred-sources)。
+            公式ドキュメント通りscriptタグのみ<head>に配置し、ボタン自体はFooterに設置 */}
+        <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" as="style" href={googleFontsHref} />
