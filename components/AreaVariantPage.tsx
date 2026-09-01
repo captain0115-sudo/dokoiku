@@ -82,6 +82,20 @@ export default async function AreaVariantPage({ code, variant }: Props) {
   const heading = variant.buildHeading(pref.name);
   const introExtra = variant.buildIntroExtra(pref.name);
   const otherVariants = AREA_VARIANT_LIST.filter((v) => v.key !== variant.key);
+  const faqItems = variant.buildFaq?.(pref.name) ?? [];
+
+  const faqJsonLd =
+    faqItems.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqItems.map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: { "@type": "Answer", text: item.a },
+          })),
+        }
+      : null;
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -147,6 +161,13 @@ export default async function AreaVariantPage({ code, variant }: Props) {
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        />
+      )}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
 
@@ -233,6 +254,32 @@ export default async function AreaVariantPage({ code, variant }: Props) {
           ))}
         </div>
       </section>
+
+      {faqItems.length > 0 && (
+        <section className="mb-10">
+          <h2 className="font-display font-bold text-ink text-base mb-3">
+            よくある質問
+          </h2>
+          <div className="flex flex-col gap-3">
+            {faqItems.map((item) => (
+              <details
+                key={item.q}
+                className="rounded-2xl border border-line bg-surface p-4 group"
+              >
+                <summary className="font-body font-semibold text-sm text-ink cursor-pointer list-none flex items-center justify-between gap-2">
+                  {item.q}
+                  <span className="text-sub text-xs font-mono shrink-0 group-open:rotate-180 transition-transform">
+                    ▼
+                  </span>
+                </summary>
+                <p className="text-sub text-xs font-body leading-relaxed mt-2">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
 
       {neighbors.length > 0 && (
         <section className="mb-10">
