@@ -87,14 +87,6 @@ export default function Footer() {
             >
               X(@dokoiku_tokyo)
             </a>
-            <a
-              href="https://room.rakuten.co.jp/room_1b6167f7c7"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sub text-xs font-body underline hover:text-ink"
-            >
-              楽天ROOM
-            </a>
           </div>
         </div>
 
