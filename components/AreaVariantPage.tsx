@@ -198,7 +198,11 @@ export default async function AreaVariantPage({ code, variant }: Props) {
 
       <div className="mb-8 flex flex-wrap items-center gap-3">
         <Link
-          href={`/?mode=region&prefill=${pref.middleClassCode}`}
+          href={`/?mode=region&prefill=${pref.middleClassCode}${
+            variant.maxDisplayCharge != null
+              ? `&maxCharge=${variant.maxDisplayCharge}`
+              : ""
+          }`}
           className="inline-block px-6 py-3 rounded-full bg-accent text-white font-display font-bold text-sm hover:brightness-110 transition"
         >
           自分の日程で{pref.name}を検索する

@@ -35,6 +35,7 @@ export default function SearchForm({
   initialBand,
   initialCheckinDate,
   initialCheckoutDate,
+  initialMaxCharge,
 }: {
   onSearch: (values: SearchValues) => void;
   loading: boolean;
@@ -43,6 +44,7 @@ export default function SearchForm({
   initialBand?: TravelBand;
   initialCheckinDate?: string;
   initialCheckoutDate?: string;
+  initialMaxCharge?: number;
 }) {
   const [address, setAddress] = useState("");
   const [checkinDate, setCheckinDate] = useState(initialCheckinDate ?? "");
@@ -57,7 +59,9 @@ export default function SearchForm({
   const [infants, setInfants] = useState(0);
   const [onsen, setOnsen] = useState(false);
   const [nonSmoking, setNonSmoking] = useState(false);
-  const [maxCharge, setMaxCharge] = useState<string>("");
+  const [maxCharge, setMaxCharge] = useState<string>(
+    initialMaxCharge != null ? String(initialMaxCharge) : ""
+  );
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string>();
 

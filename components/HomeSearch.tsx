@@ -30,6 +30,10 @@ export default function HomeSearch() {
   const prefillCheckin = searchParams.get("checkin") ?? undefined;
   const prefillCheckout = searchParams.get("checkout") ?? undefined;
   const prefillMode = prefillRegion ? "region" : prefillBand ? "band" : undefined;
+  const prefillMaxChargeParam = searchParams.get("maxCharge");
+  const prefillMaxCharge = prefillMaxChargeParam
+    ? Number(prefillMaxChargeParam)
+    : undefined;
 
   const [hotels, setHotels] = useState<HotelResult[]>([]);
   const [originLabel, setOriginLabel] = useState<string>();
@@ -137,6 +141,7 @@ export default function HomeSearch() {
           initialBand={prefillBand}
           initialCheckinDate={prefillCheckin}
           initialCheckoutDate={prefillCheckout}
+          initialMaxCharge={prefillMaxCharge}
         />
       </div>
 
