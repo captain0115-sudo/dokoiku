@@ -3,16 +3,34 @@
  * 「今夜/明日/今週末」のクイック選択に使用する。
  */
 
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+/**
+ * 実行環境のローカルタイムゾーンに関係なく、常にJST(日本時間)基準で
+ * 日付を扱うためのヘルパー。
+ *
+ * 2026-09-06発見: Vercel(サーバー)はUTCで動作するため、`new Date()`を
+ * そのまま`getFullYear()`/`getDate()`等のローカルゲッターで読むと、
+ * JSTで見て日付が変わった後(0:00〜8:59 JST)でもUTC基準ではまだ前日のため、
+ * 「今夜泊まれる宿」ページ等が丸9時間分、日本時間で言う「昨日」の日付で
+ * 楽天APIを検索してしまい、過去日付として空室0件になる不具合があった。
+ * 渡されたDateのUTC時刻に+9時間した上でUTCゲッター/セッターで読み書きすることで、
+ * 実行環境のタイムゾーンに依存せずJSTの暦日を安定して扱えるようにする。
+ */
+function toJstShifted(d: Date): Date {
+  return new Date(d.getTime() + JST_OFFSET_MS);
+}
+
 function toDateString(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
 function addDays(d: Date, days: number): Date {
   const copy = new Date(d);
-  copy.setDate(copy.getDate() + days);
+  copy.setUTCDate(copy.getUTCDate() + days);
   return copy;
 }
 
@@ -29,15 +47,16 @@ export function nightsBetween(checkinDate: string, checkoutDate: string): number
 
 /** 今夜(今日チェックイン・翌日チェックアウト) */
 export function tonightRange(now = new Date()): DateRange {
+  const jstNow = toJstShifted(now);
   return {
-    checkinDate: toDateString(now),
-    checkoutDate: toDateString(addDays(now, 1)),
+    checkinDate: toDateString(jstNow),
+    checkoutDate: toDateString(addDays(jstNow, 1)),
   };
 }
 
 /** 明日(明日チェックイン・明後日チェックアウト) */
 export function tomorrowRange(now = new Date()): DateRange {
-  const checkin = addDays(now, 1);
+  const checkin = addDays(toJstShifted(now), 1);
   return {
     checkinDate: toDateString(checkin),
     checkoutDate: toDateString(addDays(checkin, 1)),
@@ -56,14 +75,15 @@ export function resolvePastDateRange(
   checkoutDate: string,
   now = new Date()
 ): DateRange {
-  const todayStr = toDateString(now);
+  const jstNow = toJstShifted(now);
+  const todayStr = toDateString(jstNow);
   if (checkinDate >= todayStr) {
     return { checkinDate, checkoutDate };
   }
   const nights = nightsBetween(checkinDate, checkoutDate);
   return {
     checkinDate: todayStr,
-    checkoutDate: toDateString(addDays(now, nights)),
+    checkoutDate: toDateString(addDays(jstNow, nights)),
   };
 }
 
@@ -72,7 +92,8 @@ export function resolvePastDateRange(
  * 今日が土曜/日曜の場合は今日を起点にする。
  */
 export function thisWeekendRange(now = new Date()): DateRange {
-  const day = now.getDay(); // 0:日 1:月 ... 6:土
+  const jstNow = toJstShifted(now);
+  const day = jstNow.getUTCDay(); // 0:日 1:月 ... 6:土(JST基準)
   let daysUntilSaturday: number;
 
   if (day === 6) {
@@ -83,7 +104,7 @@ export function thisWeekendRange(now = new Date()): DateRange {
     daysUntilSaturday = 6 - day;
   }
 
-  const checkin = addDays(now, daysUntilSaturday);
+  const checkin = addDays(jstNow, daysUntilSaturday);
   return {
     checkinDate: toDateString(checkin),
     checkoutDate: toDateString(addDays(checkin, 1)),
