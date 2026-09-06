@@ -19,6 +19,13 @@ export type AreaVariant = {
   buildTitle: (prefName: string) => string;
   buildDescription: (prefName: string, catchphrase: string) => string;
   buildHeading: (prefName: string) => string;
+  /**
+   * 空室一覧セクションの見出し(H2)。オンページSEO監査(2026-09-07)で判明した点:
+   * H1(buildHeading)はバリエーションごとのキーワード(格安ホテル・温泉宿等)を含むが、
+   * この見出しが従来「{都道府県}の空室(件数)」で全バリエーション共通になっており、
+   * H2でのキーワード反復機会を逃していた。バリエーションごとに自然な形で言い換える。
+   */
+  buildResultsHeading: (prefName: string, count: number) => string;
   /** 通常の紹介文に足す一文(このバリエーション特有の説明)。無ければ空文字 */
   buildIntroExtra: (prefName: string) => string;
   dateRange: () => DateRange;
@@ -48,6 +55,7 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     buildDescription: (name, catchphrase) =>
       `${name}で今空いているホテルを価格が安い順に一覧表示。日付を指定して、行き先を${name}に限定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}のホテル空室状況`,
+    buildResultsHeading: (name, count) => `${name}のホテル空室一覧(${count}件)`,
     buildIntroExtra: () => "",
     dateRange: thisWeekendRange,
     emptyMessage: "この日程では、条件に合う空室が見つかりませんでした。",
@@ -60,6 +68,7 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     buildDescription: (name, catchphrase) =>
       `${name}で今空いている温泉宿だけを価格が安い順に一覧表示。日付を指定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}の温泉宿 空室状況`,
+    buildResultsHeading: (name, count) => `${name}の温泉宿 空室一覧(${count}件)`,
     buildIntroExtra: (name) =>
       `こちらは楽天トラベルの温泉宿条件で絞り込んだ結果で、${name}内の温泉付き宿泊施設のみを表示しています。`,
     dateRange: thisWeekendRange,
@@ -74,6 +83,7 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     buildDescription: (name, catchphrase) =>
       `${name}で今夜からすぐ泊まれる空室ホテルを価格が安い順に一覧表示。直前予約・弾丸旅行にも。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}で今夜泊まれる宿(直前予約)`,
+    buildResultsHeading: (name, count) => `${name}で今夜泊まれる宿 一覧(${count}件)`,
     buildIntroExtra: (name) =>
       `急な出張や弾丸旅行にも対応できるよう、今日チェックイン・翌日チェックアウトの条件で${name}内の直前予約可能な宿を探せます。`,
     dateRange: tonightRange,
@@ -87,6 +97,7 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     buildDescription: (name, catchphrase) =>
       `${name}で1泊1万円以下の予算重視ホテルだけを価格が安い順に一覧表示。日付を指定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}の格安ホテル(1万円以下)`,
+    buildResultsHeading: (name, count) => `${name}の格安ホテル一覧(${count}件)`,
     buildIntroExtra: (name) =>
       `こちらは1泊あたり1万円以下という予算条件で絞り込んだ結果で、${name}内の指定人数での実料金が1万円以下の宿泊施設のみを表示しています。`,
     dateRange: thisWeekendRange,

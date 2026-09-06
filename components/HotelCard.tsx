@@ -9,6 +9,7 @@ export default function HotelCard({
   highlighted,
   nights = 1,
   distanceLabel = "起点から",
+  areaLabel,
 }: {
   hotel: HotelResult;
   highlighted?: boolean;
@@ -20,6 +21,13 @@ export default function HotelCard({
    * (デフォルトのまま放置すると、検索結果のスニペットにも表示され意味不明になる)。
    */
   distanceLabel?: string;
+  /**
+   * 画像alt文言に添える地域名(例: 「奈良県」)。オンページSEO監査(2026-09-07)で、
+   * 画像altがホテル名のみでエリア文脈を含んでいなかった点を修正。都道府県が
+   * 特定できるページ(エリアページ等)からのみ渡す想定で、トップページの通常検索
+   * (起点住所は必ずしも都道府県と一致しない)では渡さず従来通りホテル名のみとする。
+   */
+  areaLabel?: string;
 }) {
   const total = hotel.hotelMinCharge * nights;
 
@@ -45,7 +53,7 @@ export default function HotelCard({
       <div className="relative w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-xl overflow-hidden border border-line bg-bg">
         <Image
           src={hotel.hotelImageUrl}
-          alt={hotel.hotelName}
+          alt={areaLabel ? `${hotel.hotelName}（${areaLabel}）` : hotel.hotelName}
           fill
           sizes="(min-width: 640px) 128px, 96px"
           className="object-cover"

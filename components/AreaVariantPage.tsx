@@ -226,7 +226,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
         <div className="bg-surface border border-line rounded-2xl overflow-hidden shadow-sm mb-10">
           <div className="px-5 py-4 border-b border-line">
             <h2 className="font-display font-bold text-ink text-base">
-              {pref.name}の空室({hotels.length}件)
+              {variant.buildResultsHeading(pref.name, hotels.length)}
             </h2>
           </div>
           <div className="px-3 divide-y divide-line">
@@ -236,6 +236,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
                 hotel={hotel}
                 nights={nights}
                 distanceLabel={`${pref.name}の中心部から`}
+                areaLabel={pref.name}
               />
             ))}
           </div>
