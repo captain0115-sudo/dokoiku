@@ -34,6 +34,7 @@ export default function HomeSearch() {
   const prefillMaxCharge = prefillMaxChargeParam
     ? Number(prefillMaxChargeParam)
     : undefined;
+  const prefillOnsen = searchParams.get("onsen") === "1";
 
   const [hotels, setHotels] = useState<HotelResult[]>([]);
   const [originLabel, setOriginLabel] = useState<string>();
@@ -142,6 +143,7 @@ export default function HomeSearch() {
           initialCheckinDate={prefillCheckin}
           initialCheckoutDate={prefillCheckout}
           initialMaxCharge={prefillMaxCharge}
+          initialOnsen={prefillOnsen}
         />
       </div>
 

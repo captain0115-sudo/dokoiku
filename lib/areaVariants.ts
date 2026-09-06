@@ -26,6 +26,14 @@ export type AreaVariant = {
    * H2でのキーワード反復機会を逃していた。バリエーションごとに自然な形で言い換える。
    */
   buildResultsHeading: (prefName: string, count: number) => string;
+  /**
+   * 「自分の日程で検索する」CTAボタンの文言。オンページSEO監査(2026-09-07)で
+   * CTAにもキーワードを含めるべきと判断したが、絞り込み条件(価格上限・温泉宿等)が
+   * 実際にトップページへ引き継がれる場合のみキーワードを足すこと(引き継がれないのに
+   * 文言だけ足すと実際の挙動と食い違う、2026-09-03のmaxCharge引き継ぎ漏れと同種の
+   * 問題になる)。未指定なら`自分の日程で{都道府県}を検索する`という基本形を使う。
+   */
+  buildCtaLabel?: (prefName: string) => string;
   /** 通常の紹介文に足す一文(このバリエーション特有の説明)。無ければ空文字 */
   buildIntroExtra: (prefName: string) => string;
   dateRange: () => DateRange;
@@ -69,6 +77,7 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
       `${name}で今空いている温泉宿だけを価格が安い順に一覧表示。日付を指定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}の温泉宿 空室状況`,
     buildResultsHeading: (name, count) => `${name}の温泉宿 空室一覧(${count}件)`,
+    buildCtaLabel: (name) => `自分の日程で${name}の温泉宿を検索する`,
     buildIntroExtra: (name) =>
       `こちらは楽天トラベルの温泉宿条件で絞り込んだ結果で、${name}内の温泉付き宿泊施設のみを表示しています。`,
     dateRange: thisWeekendRange,
@@ -98,6 +107,7 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
       `${name}で1泊1万円以下の予算重視ホテルだけを価格が安い順に一覧表示。日付を指定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}の格安ホテル(1万円以下)`,
     buildResultsHeading: (name, count) => `${name}の格安ホテル一覧(${count}件)`,
+    buildCtaLabel: (name) => `自分の日程で${name}の格安ホテルを検索する`,
     buildIntroExtra: (name) =>
       `こちらは1泊あたり1万円以下という予算条件で絞り込んだ結果で、${name}内の指定人数での実料金が1万円以下の宿泊施設のみを表示しています。`,
     dateRange: thisWeekendRange,

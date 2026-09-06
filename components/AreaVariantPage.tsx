@@ -202,10 +202,11 @@ export default async function AreaVariantPage({ code, variant }: Props) {
             variant.maxDisplayCharge != null
               ? `&maxCharge=${variant.maxDisplayCharge}`
               : ""
-          }`}
+          }${variant.filters?.onsen ? "&onsen=1" : ""}`}
           className="inline-block px-6 py-3 rounded-full bg-accent text-white font-display font-bold text-sm hover:brightness-110 transition"
         >
-          自分の日程で{pref.name}を検索する
+          {variant.buildCtaLabel?.(pref.name) ??
+            `自分の日程で${pref.name}を検索する`}
         </Link>
         <ShareButtons url={pageUrl} text={`${heading} | どこいく`} />
       </div>
