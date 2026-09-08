@@ -245,7 +245,8 @@ async function requestVacantHotels(
 async function fetchWithRetry(
   url: string,
   headers: Record<string, string>,
-  retriesLeft = 2
+  retriesLeft = 2,
+  rateLimitRetriesLeft = 3
 ): Promise<any> {
   let res: Response;
   try {
@@ -253,24 +254,27 @@ async function fetchWithRetry(
   } catch (err) {
     if (retriesLeft > 0) {
       await sleep(300);
-      return fetchWithRetry(url, headers, retriesLeft - 1);
+      return fetchWithRetry(url, headers, retriesLeft - 1, rateLimitRetriesLeft);
     }
     throw err;
   }
 
   if (!res.ok) {
     const body = await res.text();
-    // 429(レート制限)は複数エリアを同時取得するページ(お盆特集等)で頻発することを確認済み。
-    // 楽天側のエラーメッセージが「Try again in 1 seconds」等と案内するため、5xxより長めに待って
-    // 再試行する(2026-08-13対応、以前は429を意図的にリトライ対象外にしていたが、
-    // 短時間の待機であれば悪化させずに解消できることを確認したため対象に含めた)。
-    if (res.status === 429 && retriesLeft > 0) {
-      await sleep(1500);
-      return fetchWithRetry(url, headers, retriesLeft - 1);
+    // 429(レート制限)は複数エリアを同時取得するページ(お盆特集等)や、地方単位で
+    // 8件を同時実行する通常検索(実際に2026-09-08夜の実利用ログで複数県が同時に
+    // 429で失敗するのを確認)で頻発する。5xx/ネットワークエラー用のretriesLeftとは
+    // 別カウンタ(rateLimitRetriesLeft)を用意し、待機時間を試行ごとに伸ばす
+    // (1.5s→3s→4.5s)ことで、同時実行中の他エリアの再試行と重ならず楽天側の
+    // レート制限が解除されるまでの猶予を確保する(2026-09-08対応)。
+    if (res.status === 429 && rateLimitRetriesLeft > 0) {
+      const attempt = 4 - rateLimitRetriesLeft; // 1, 2, 3
+      await sleep(1500 * attempt);
+      return fetchWithRetry(url, headers, retriesLeft, rateLimitRetriesLeft - 1);
     }
     if (res.status >= 500 && retriesLeft > 0) {
       await sleep(300);
-      return fetchWithRetry(url, headers, retriesLeft - 1);
+      return fetchWithRetry(url, headers, retriesLeft - 1, rateLimitRetriesLeft);
     }
     // 【2026-08-26修正】squeezeCondition(温泉宿のみ等)で絞り込んだ際、該当施設が
     // そのエリアに1件も無い場合、楽天トラベルAPIはエラーではなく404
