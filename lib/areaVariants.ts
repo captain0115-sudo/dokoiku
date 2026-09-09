@@ -88,9 +88,15 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     key: "tonight",
     pathSuffix: "/tonight",
     navLabel: "今夜泊まれる宿(直前予約)",
-    buildTitle: (name) => `${name}で今夜泊まれる宿｜直前予約・価格順 - どこいく`,
+    // 2026-09-09: GSC×SERPクラスタリング分析(SEOクラスタリング分析_2026-09-09.md)で、
+    // このバリエーションが対応する「空き状況・空室・AI会話型」クラスタは掲載順位8〜20位台と
+    // 好位置にありながらCTRがほぼ0%と判明。原因の一つとして、GSC実クエリに頻出する
+    // 「空き状況」「空室状況」「空室」という言葉がタイトル・meta descriptionに一語も
+    // 含まれていなかった(「直前予約」という同義だが非一致の言葉のみ)ことを特定し、
+    // 検索意図の言葉をそのままタイトル冒頭に反映した。
+    buildTitle: (name) => `${name}のホテル空室状況｜今夜泊まれる宿・直前予約 - どこいく`,
     buildDescription: (name, catchphrase) =>
-      `${name}で今夜からすぐ泊まれる空室ホテルを価格が安い順に一覧表示。直前予約・弾丸旅行にも。${catchphrase}が魅力のエリアです。`,
+      `${name}のホテルの空室状況を今すぐ確認。今夜からすぐ泊まれる空室ホテルを価格が安い順に一覧表示します。直前予約・弾丸旅行にも。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}で今夜泊まれる宿(直前予約)`,
     buildResultsHeading: (name, count) => `${name}で今夜泊まれる宿 一覧(${count}件)`,
     buildIntroExtra: (name) =>
