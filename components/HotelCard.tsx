@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { track } from "@vercel/analytics";
+import { sendGAEvent } from "@next/third-parties/google";
 import type { HotelResult } from "@/lib/rakuten";
 
 export default function HotelCard({
@@ -37,15 +38,20 @@ export default function HotelCard({
       href={hotel.planListUrl}
       target="_blank"
       rel="noopener noreferrer sponsored"
-      onClick={() =>
+      onClick={() => {
         // 楽天への実際の送客(コンバージョンの最終ステップ)を計測する。
         // 個人情報は含めず、ホテル名・価格・距離帯など集計に必要な情報のみ送る。
-        track("hotel_click", {
+        // 2026-09-10: GA4には拡張計測機能の汎用clickイベントしか届いておらず、この
+        // 最重要イベントがVercel Analyticsのみにしか記録されていなかったため、
+        // GA4側にも同じイベントを送るようにした(GA4でキーイベントとして登録する前提)。
+        const payload = {
           hotelName: hotel.hotelName,
           price: hotel.hotelMinCharge,
           highlighted: Boolean(highlighted),
-        })
-      }
+        };
+        track("hotel_click", payload);
+        sendGAEvent("event", "hotel_click", payload);
+      }}
       className={`grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-3 sm:gap-4 items-center py-4 px-2 rounded-xl transition-colors ${
         highlighted ? "ring-2 ring-accent bg-accentSoft" : "hover:bg-bg"
       }`}
