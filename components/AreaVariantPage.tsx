@@ -82,7 +82,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
   const heading = variant.buildHeading(pref.name);
   const introExtra = variant.buildIntroExtra(pref.name);
   const otherVariants = AREA_VARIANT_LIST.filter((v) => v.key !== variant.key);
-  const faqItems = variant.buildFaq?.(pref.name) ?? [];
+  const faqItems = variant.buildFaq?.(pref) ?? [];
 
   const faqJsonLd =
     faqItems.length > 0
