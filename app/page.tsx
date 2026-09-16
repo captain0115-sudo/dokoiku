@@ -3,6 +3,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import HomeSearch from "@/components/HomeSearch";
 import { thisWeekendRange, tomorrowRange } from "@/lib/dates";
+import { REGION_LABELS, prefecturesInRegion, type RegionKey } from "@/lib/prefectures";
 
 // SEO監査(2026-08-28)で判明: フッターは47都道府県の「通常(週末)」ページのみにリンクしており、
 // 温泉宿限定(onsen)・今夜泊まれる宿(tonight)・1万円以下(budget)の3バリエーション(計141ページ)は
@@ -100,6 +101,44 @@ export default function Home() {
       >
         <HomeSearch />
       </Suspense>
+
+      {/* 2026-09-16: 「地方で選ぶ」モードでも起点住所の入力が必須になっており、
+          都道府県を選ぶだけの人には不要な手間になっていた(ユーザー指摘)。起点入力なしで
+          即座に都道府県別ページ(/areas/[code]、SEO用に作り込み済み・地方ごとの内部リンクも
+          既存)へ飛べる近道をトップページに追加した。検索フォームの挙動自体は変更していない。 */}
+      <section className="mt-10">
+        <details className="rounded-2xl border border-line bg-surface p-4 group">
+          <summary className="font-display font-bold text-ink text-base cursor-pointer list-none flex items-center justify-between gap-2">
+            都道府県からすぐ探す(起点の入力は不要です)
+            <span className="text-sub text-xs font-mono shrink-0 group-open:rotate-180 transition-transform">
+              ▼
+            </span>
+          </summary>
+          <p className="text-sub text-xs font-body leading-relaxed mt-2 mb-4">
+            地方ごとにまとめた都道府県一覧です。タップすると、その都道府県で今空いている宿を価格の安い順にすぐ確認できます。
+          </p>
+          <div className="flex flex-col gap-3">
+            {(Object.keys(REGION_LABELS) as RegionKey[]).map((key) => (
+              <div key={key}>
+                <p className="text-sub text-xs font-mono tracking-wideLabel uppercase mb-2">
+                  {REGION_LABELS[key]}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {prefecturesInRegion(key).map((p) => (
+                    <Link
+                      key={p.middleClassCode}
+                      href={`/areas/${p.middleClassCode}`}
+                      className="pill-button pill-button-inactive text-xs"
+                    >
+                      {p.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
+      </section>
 
       {/* SEO監査(2026-08-13)で指摘: H2見出しが一切なくサービス説明が薄いとのことで追加。
           既存機能の説明のみで、実績・効果を誇張する表現は入れない。 */}
