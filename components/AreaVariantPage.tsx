@@ -186,8 +186,23 @@ export default async function AreaVariantPage({ code, variant }: Props) {
       <p className="text-sub font-body text-sm leading-relaxed mb-8">
         {pref.catchphrase}が魅力の{pref.name}
         {regionLabel && `は${regionLabel}地方に位置し`}
-        {neighbors.length > 0 &&
-          `、${neighbors.map((n) => n.name).join("・")}などが近隣にあります`}
+        {neighbors.length > 0 && (
+          <>
+            、
+            {neighbors.map((n, i) => (
+              <span key={n.middleClassCode}>
+                {i > 0 && "・"}
+                <Link
+                  href={`/areas/${n.middleClassCode}${variant.pathSuffix}`}
+                  className="underline hover:text-ink"
+                >
+                  {n.name}
+                </Link>
+              </span>
+            ))}
+            などが近隣にあります
+          </>
+        )}
         。「どこいく」は、行き先を決める前に日付から空室のある宿を探せる
         サービスです。ここでは{checkinDate}〜{checkoutDate}を例に、
         {pref.name}で現在空室のある宿を価格の安い順に表示しています。
