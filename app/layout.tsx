@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
+import PwaAnalytics from "@/components/PwaAnalytics";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
 const gaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-N4LQJY73L6";
@@ -104,6 +105,8 @@ export default function RootLayout({
         <Footer />
         {/* Vercelホスティング標準のアクセス解析。追加のIDや環境変数設定は不要 */}
         <Analytics />
+        {/* PWA化計画Phase 0(どこいく/app-ka-pwa-plan-2026-09-16.md)の計測基盤 */}
+        <PwaAnalytics />
       </body>
       {/* GA4(Googleマーケティングプラットフォーム)。2026-08-19、ユーザーがGoogle
           アナリティクスでプロパティ「dokoiku」を作成しMeasurement IDを取得したため導入。
