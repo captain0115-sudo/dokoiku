@@ -78,7 +78,9 @@ export default function HotelCard({
         <p className="text-sub text-xs font-mono tabnum mt-1">
           {distanceLabel} {hotel.distanceKm.toFixed(0)} km ・{" "}
           {hotel.reviewAverage != null
-            ? `評価 ${hotel.reviewAverage.toFixed(1)}`
+            ? `評価 ${hotel.reviewAverage.toFixed(1)}${
+                hotel.reviewCount != null ? `(${hotel.reviewCount.toLocaleString()}件)` : ""
+              }`
             : "評価なし"}
         </p>
         {/* 価格情報はモバイル幅ではここに折り返して表示 */}
@@ -125,9 +127,11 @@ function PriceBlock({
       <p className="text-sub text-[10px] font-mono mt-0.5 hidden sm:block">
         指定人数での最安プラン
       </p>
-      {/* カード全体がリンクであることが伝わりにくいため、クリック先を明示するCTA表記 */}
-      <span className="inline-flex items-center gap-0.5 mt-2 text-[11px] font-mono font-semibold text-accent whitespace-nowrap">
-        空室・料金を見る
+      {/* カード全体がリンクであることに加え、外部(楽天トラベル)へ遷移することを事前に
+          明示するCTA(2026-09-17改善)。単なる文字リンクだとクリック後の遷移先が不明で
+          離脱不安につながるため、遷移先を明示したボタン調に変更した */}
+      <span className="pill-button pill-button-active inline-flex items-center gap-1 mt-2 !px-3 !py-1.5 text-[11px] font-mono font-semibold whitespace-nowrap">
+        楽天トラベルで空室を確認
         <svg
           width="11"
           height="11"
