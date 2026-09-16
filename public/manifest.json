@@ -1,0 +1,27 @@
+{
+  "name": "どこいく | 日付から探すホテル空室検索",
+  "short_name": "どこいく",
+  "description": "行き先ではなく日付から探す。空室のあるホテルを価格・距離で比較できるサービス「どこいく」。",
+  "start_url": "/?utm_source=pwa&utm_medium=homescreen",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F6F7F9",
+  "theme_color": "#24417A",
+  "orientation": "portrait-primary",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

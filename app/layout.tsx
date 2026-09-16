@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import PwaAnalytics from "@/components/PwaAnalytics";
+import PwaServiceWorker from "@/components/PwaServiceWorker";
+import InstallPrompt from "@/components/InstallPrompt";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
 const gaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-N4LQJY73L6";
@@ -16,6 +18,11 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon.svg",
   },
+  // PWA化(app-ka-pwa-plan-2026-09-16.md Phase 1)。iOSホーム画面用アイコンは
+  // app/apple-icon.pngのファイル規約で自動生成される(metadata.iconsとの併用は
+  // Next.jsが正しくマージしないことがあるため、規約側に寄せた)。
+  // manifest.jsonでホーム画面追加時のアプリ名・表示モード(standalone)等を指定する。
+  manifest: "/manifest.json",
   alternates: {
     canonical: "/",
   },
@@ -33,6 +40,10 @@ export const metadata: Metadata = {
     description:
       "行き先ではなく日付から探す。空室のあるホテルを価格・距離で比較できるサービス「どこいく」。",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#24417A",
 };
 
 const jsonLd = {
@@ -105,8 +116,11 @@ export default function RootLayout({
         <Footer />
         {/* Vercelホスティング標準のアクセス解析。追加のIDや環境変数設定は不要 */}
         <Analytics />
-        {/* PWA化計画Phase 0(どこいく/app-ka-pwa-plan-2026-09-16.md)の計測基盤 */}
+        {/* PWA化計画(どこいく/app-ka-pwa-plan-2026-09-16.md) Phase 0: 計測基盤 */}
         <PwaAnalytics />
+        {/* PWA化計画 Phase 1: Service Worker登録・インストール導線 */}
+        <PwaServiceWorker />
+        <InstallPrompt />
       </body>
       {/* GA4(Googleマーケティングプラットフォーム)。2026-08-19、ユーザーがGoogle
           アナリティクスでプロパティ「dokoiku」を作成しMeasurement IDを取得したため導入。
