@@ -28,8 +28,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // 夏休み後半(8/22〜8/24)テーマに切り替え、2026-08-25に夏休み終了を受けて
       // 新規ページ/silverweek2026(9/19〜23の5連休)へ切り替えた。旧/obon2026は
       // 内部リンクを外したがページ自体は残す(既存インデックス・被リンクの維持)。
-      // このテーマも過ぎたら内容の見直し・削除を検討すること。
+      // 2026-09-20: シルバーウィーク終了(9/23)後、下の/sportsday2026に主役を
+      // 譲る予定。9/23を過ぎたらこのエントリを削除しページ自体は残すこと
+      // (過去の切り替えと同じ運用)。
       url: `${baseUrl}/silverweek2026`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
+      // 次の季節特集: スポーツの日3連休(10/10〜12)。シルバーウィークが終わる
+      // 前に事前公開し、Googleのクロール・インデックスに猶予を持たせる
+      // (2026-09-20追加)。
+      url: `${baseUrl}/sportsday2026`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.8,
