@@ -18,13 +18,17 @@ export async function GET(req: NextRequest) {
   const band = params.get("band") as TravelBand | null;
   const region = params.get("region") as RegionKey | null;
 
-  if (!address) {
+  // region指定は自宅住所を使わないため、/api/hotelsと同様address任意にする(2026-09-22)。
+  const regionModeWithoutAddress =
+    mode === "region" && region && REGION_LABELS[region] && !address;
+
+  if (!address && !regionModeWithoutAddress) {
     return NextResponse.json({ error: "address は必須です" }, { status: 400 });
   }
 
   try {
-    const geo = await geocodeAddress(address);
-    if (!geo) {
+    const geo = address ? await geocodeAddress(address) : null;
+    if (address && !geo) {
       return NextResponse.json(
         { error: "住所から位置情報を特定できませんでした" },
         { status: 404 }
@@ -39,16 +43,18 @@ export async function GET(req: NextRequest) {
         .slice(0, MAX_AREAS_PER_SEARCH)
         .map((p) => p.name);
       rangeLabel = REGION_LABELS[region];
-    } else if (mode === "band" && band && BAND_LABELS[band]) {
+    } else if (mode === "band" && band && BAND_LABELS[band] && geo) {
       areas = prefecturesInBand(geo.lat, geo.lng, band)
         .slice(0, MAX_AREAS_PER_SEARCH)
         .map((p) => p.name);
       rangeLabel = BAND_LABELS[band];
-    } else {
+    } else if (geo) {
       areas = defaultPrefectures(geo.lat, geo.lng)
         .slice(0, MAX_AREAS_PER_SEARCH)
         .map((p) => p.name);
       rangeLabel = "指定なし";
+    } else {
+      return NextResponse.json({ error: "address は必須です" }, { status: 400 });
     }
 
     return NextResponse.json({ areas, rangeLabel });

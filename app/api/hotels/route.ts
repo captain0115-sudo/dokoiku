@@ -44,7 +44,22 @@ export async function GET(req: NextRequest) {
       : undefined,
   };
 
-  if (!address || !checkinDate || !checkoutDate) {
+  if (!checkinDate || !checkoutDate) {
+    return NextResponse.json(
+      { error: "checkinDate, checkoutDate は必須です" },
+      { status: 400 }
+    );
+  }
+
+  // region指定検索(都道府県・地方名で絞り込み)は「自宅からの距離」を使わないため、
+  // 本来address(現在地)は不要。以前はband/none等と同じ扱いでaddress必須にしていたが、
+  // これがエリアページ(/areas/[code])の「自分の日程で検索する」CTAからトップページに
+  // 戻った際に追加で住所入力・位置情報許可を求める形になり、離脱要因になっていた
+  // (2026-09-22、hotel_clickのトップページ一極集中の一因として調査・特定)。
+  const regionModeWithoutAddress =
+    mode === "region" && region && REGION_LABELS[region] && !address;
+
+  if (!address && !regionModeWithoutAddress) {
     return NextResponse.json(
       { error: "address, checkinDate, checkoutDate は必須です" },
       { status: 400 }
@@ -52,8 +67,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const geo = await geocodeAddress(address);
-    if (!geo) {
+    const geo = address ? await geocodeAddress(address) : null;
+    if (address && !geo) {
       return NextResponse.json(
         { error: "住所から位置情報を特定できませんでした" },
         { status: 404 }
@@ -66,12 +81,19 @@ export async function GET(req: NextRequest) {
     if (mode === "region" && region && REGION_LABELS[region]) {
       targetPrefectures = prefecturesInRegion(region);
       rangeLabel = REGION_LABELS[region];
-    } else if (mode === "band" && band && BAND_LABELS[band]) {
+    } else if (mode === "band" && band && BAND_LABELS[band] && geo) {
       targetPrefectures = prefecturesInBand(geo.lat, geo.lng, band);
       rangeLabel = BAND_LABELS[band];
-    } else {
+    } else if (geo) {
       targetPrefectures = defaultPrefectures(geo.lat, geo.lng);
       rangeLabel = "指定なし(自宅からある程度離れたエリア)";
+    } else {
+      // regionModeWithoutAddressで通ってきたがregion指定自体が不正だった場合の保険
+      // (通常はここに到達しない)
+      return NextResponse.json(
+        { error: "address, checkinDate, checkoutDate は必須です" },
+        { status: 400 }
+      );
     }
 
     targetPrefectures = targetPrefectures.slice(0, MAX_AREAS_PER_SEARCH);
@@ -96,8 +118,11 @@ export async function GET(req: NextRequest) {
             checkoutDate,
             areaLat: pref.lat,
             areaLng: pref.lng,
-            homeLat: geo.lat,
-            homeLng: geo.lng,
+            // 住所なし(region指定のみ)の場合は「自宅からの距離」自体が無意味なので、
+            // エリアページ(components/AreaVariantPage.tsx)と同じくエリア中心自身を
+            // 基点にする(距離表示は「エリア中心からXkm」という参考値になる)。
+            homeLat: geo?.lat ?? pref.lat,
+            homeLng: geo?.lng ?? pref.lng,
             guests,
             filters,
           }).then(

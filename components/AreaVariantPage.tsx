@@ -213,7 +213,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
 
       <div className="mb-8 flex flex-wrap items-center gap-3">
         <Link
-          href={`/?mode=region&prefill=${pref.middleClassCode}${
+          href={`/?mode=region&prefill=${pref.middleClassCode}&checkin=${checkinDate}&checkout=${checkoutDate}${
             variant.maxDisplayCharge != null
               ? `&maxCharge=${variant.maxDisplayCharge}`
               : ""

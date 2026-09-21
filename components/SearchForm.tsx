@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
 import { REGION_LABELS, RegionKey } from "@/lib/prefectures";
 import { BAND_LABELS, BAND_HINTS, TravelBand } from "@/lib/distanceBands";
@@ -67,13 +67,12 @@ export default function SearchForm({
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string>();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function submitSearch(preset: string) {
     // 広告経由の流入がどこまで検索実行(コンバージョンの第一歩)に至っているかを見るための
     // イベント計測。住所などの個人情報は送らず、検索条件の傾向のみ記録する。
     track("search_submit", {
       mode,
-      preset: activePreset ?? "custom",
+      preset,
       onsen,
       nonSmoking,
       hasMaxCharge: Boolean(maxCharge),
@@ -95,6 +94,23 @@ export default function SearchForm({
       maxCharge: maxCharge ? Number(maxCharge) : undefined,
     });
   }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    submitSearch(activePreset ?? "custom");
+  }
+
+  // エリアページのCTA(「自分の日程で◯◯を検索する」)経由でmode/region/日付が
+  // prefillされて遷移してきた場合、フォームを表示するだけで終わらせず自動的に
+  // 検索まで実行する。CTA→トップページで再度「検索」を押させる一手間が、エリアページの
+  // hotel_clickがトップページに一極集中してしまう(2026-09時点で92%)一因と見られるため。
+  useEffect(() => {
+    if (initialMode && initialCheckinDate && initialCheckoutDate) {
+      submitSearch("area_prefill_auto");
+    }
+    // 初回マウント時のみ実行(以降のinitial*変更では再実行しない)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function applyPreset(name: string, range: DateRange) {
     setCheckinDate(range.checkinDate);
