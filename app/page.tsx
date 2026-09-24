@@ -75,21 +75,28 @@ export default function Home() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
-      <header className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-accentSoft via-surface to-white px-6 py-10 sm:px-10 sm:py-14 mb-10">
-        {/* 画像アセット不要な範囲での装飾(ぼかした円の重なりで奥行きを演出) */}
+      <header className="relative overflow-hidden rounded-3xl border border-line bg-accentSoft px-6 py-10 sm:px-10 sm:py-16 mb-10">
+        {/* taste-skill試験導入(2026-09-24): ぼかし円2つ(いわゆるAI臭のある装飾)を、
+            意図のあるドットグリッドパターンに置き換え。マスクで右下に向けて減衰させ、
+            背景として主張しすぎないようにしている */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-16 -right-16 w-64 h-64 rounded-full bg-accent/10 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-20 -left-10 w-56 h-56 rounded-full bg-price/10 blur-3xl"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, #24417A33 1px, transparent 1px)",
+            backgroundSize: "20px 20px",
+            maskImage:
+              "linear-gradient(to bottom right, black, transparent 75%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom right, black, transparent 75%)",
+          }}
         />
         <div className="relative">
           <div className="mb-5">
             <Logo />
           </div>
-          <h1 className="font-display font-black text-3xl md:text-5xl text-ink leading-tight">
+          <h1 className="font-display font-black text-3xl md:text-5xl text-ink leading-tight max-w-sm">
             行き先じゃなく、
             <br className="sm:hidden" />
             日付から。
@@ -99,7 +106,7 @@ export default function Home() {
           </p>
           <Link
             href="/sportsday2026"
-            className="inline-flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-white/70 border border-line text-ink text-xs font-mono font-semibold hover:bg-white transition"
+            className="inline-flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-white border border-line text-ink text-xs font-mono font-semibold hover:border-accent hover:bg-white/80 transition"
           >
             🍁 季節特集: スポーツの日3連休(10/10〜12)の空室ホテルを見る
           </Link>
@@ -235,28 +242,35 @@ export default function Home() {
       </section>
 
       <section className="mt-10">
-        <h2 className="font-display font-bold text-xl text-ink mb-4">
+        <h2 className="font-display font-bold text-xl text-ink mb-6">
           使い方
         </h2>
-        <ol className="grid gap-3 sm:grid-cols-3 list-none">
-          <li className="rounded-2xl border border-line bg-surface p-4">
-            <p className="font-mono text-xs text-accent mb-1">STEP 1</p>
-            <p className="text-sub text-xs font-body leading-relaxed">
-              チェックイン・チェックアウトの日付を入力します。
-            </p>
-          </li>
-          <li className="rounded-2xl border border-line bg-surface p-4">
-            <p className="font-mono text-xs text-accent mb-1">STEP 2</p>
-            <p className="text-sub text-xs font-body leading-relaxed">
-              行き先の範囲(起点からの距離、または地方)を必要に応じて指定します。
-            </p>
-          </li>
-          <li className="rounded-2xl border border-line bg-surface p-4">
-            <p className="font-mono text-xs text-accent mb-1">STEP 3</p>
-            <p className="text-sub text-xs font-body leading-relaxed">
-              検索ボタンを押すと、条件に合う宿が価格順に一覧表示されます。
-            </p>
-          </li>
+        {/* taste-skill試験導入(2026-09-24): 直前・直後のセクションと同じ「3カードグリッド」
+            が3連続していた(特徴/使い方/こんな時に)ため、ここだけ番号+接続線のステップ形式に
+            変えてレイアウトの単調さを崩している(Section-Layout-Repetition Banへの対応) */}
+        <ol className="grid gap-6 sm:grid-cols-3 list-none">
+          {[
+            "チェックイン・チェックアウトの日付を入力します。",
+            "行き先の範囲(起点からの距離、または地方)を必要に応じて指定します。",
+            "検索ボタンを押すと、条件に合う宿が価格順に一覧表示されます。",
+          ].map((text, i) => (
+            <li key={text}>
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-accent text-white font-mono text-sm font-semibold shrink-0">
+                  {i + 1}
+                </span>
+                {i < 2 && (
+                  <span
+                    aria-hidden="true"
+                    className="hidden sm:block h-px flex-1 bg-line"
+                  />
+                )}
+              </div>
+              <p className="text-sub text-xs font-body leading-relaxed mt-3">
+                {text}
+              </p>
+            </li>
+          ))}
         </ol>
       </section>
 
