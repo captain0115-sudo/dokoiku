@@ -82,10 +82,10 @@ export default function Home() {
             日付と起点からの範囲で、今空いているホテルを価格順に見つけます。
           </p>
           <Link
-            href="/silverweek2026"
+            href="/sportsday2026"
             className="inline-flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-white/70 border border-line text-ink text-xs font-mono font-semibold hover:bg-white transition"
           >
-            🍁 季節特集: 11年ぶりのシルバーウィーク(9/19〜23)の空室ホテルを見る
+            🍁 季節特集: スポーツの日3連休(10/10〜12)の空室ホテルを見る
           </Link>
         </div>
       </header>
