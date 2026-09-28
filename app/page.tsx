@@ -10,6 +10,12 @@ import { REGION_LABELS, prefecturesInRegion, type RegionKey } from "@/lib/prefec
 // トップページから直接たどり着けず、都道府県ページ内の「他の探し方」経由でしか発見できなかった
 // (ホームページ直下からのリンクが無いとcrawlされにくい)。主要エリアの組み合わせを
 // トップページに追加し、ホームから1クリックで到達できるようにする。
+//
+// 2026-09-29 BigQuery定例確認(seo_conversion_summary)で判明: /areas/nara/budgetが
+// 全ページ中最多の表示回数(629)を持ちながらGSCクリック0件(平均掲載順位16.6=2ページ目)。
+// このバリエーションページはフッター(weekendのみ全県リンク)からも2ホップ目でしか
+// 到達できず、表示回数上位のわりに内部リンクの評価が薄かった。他の候補(福岡/沖縄の
+// budget)と入れ替えず追加する形でリンクを増やし、直接の被リンク評価を強化する。
 const POPULAR_VARIANT_LINKS = [
   { href: "/areas/tokyo/onsen", label: "東京都の温泉宿" },
   { href: "/areas/osaka/tonight", label: "大阪府で今夜泊まれる宿" },
@@ -17,6 +23,7 @@ const POPULAR_VARIANT_LINKS = [
   { href: "/areas/hokkaido/onsen", label: "北海道の温泉宿" },
   { href: "/areas/kyoto/tonight", label: "京都府で今夜泊まれる宿" },
   { href: "/areas/fukuoka/budget", label: "福岡県の格安ホテル(1万円以下)" },
+  { href: "/areas/nara/budget", label: "奈良県の格安ホテル(1万円以下)" },
 ];
 
 const FAQ_ITEMS = [
