@@ -82,7 +82,18 @@ export default async function AreaVariantPage({ code, variant }: Props) {
   const heading = variant.buildHeading(pref.name);
   const introExtra = variant.buildIntroExtra(pref.name);
   const otherVariants = AREA_VARIANT_LIST.filter((v) => v.key !== variant.key);
-  const faqItems = variant.buildFaq?.(pref) ?? [];
+  // LLMO/差別化対応(2026-10-02): トップページ(app/page.tsx)に追加した「楽天トラベル等の
+  // 直接検索との違い」FAQを、全都道府県×全バリエーション共通で先頭に追加する。
+  // weekend/onsenバリエーションはこれまでFAQが1件もなかった(buildFaq未定義)ため、
+  // この変更でFAQPage構造化データが初めて乗る。文言はpref.nameで都道府県ごとに
+  // 差し替わるため、既存のbuildTitle/buildDescription等と同じ命名パターンに揃えている。
+  const commonFaq = [
+    {
+      q: `楽天トラベルなどで直接${pref.name}を検索するのと何が違いますか?`,
+      a: `楽天トラベル等の通常の検索は、先に行き先を1つ決めてから日程を指定する仕組みです。どこいくのトップページでは、日付と起点からの範囲(距離または地方)だけ指定すれば、${pref.name}を含む複数の都道府県の空室を1回の検索でまたいで価格順に比較できます。${pref.name}以外の候補もあわせて探したい場合は、トップページの検索フォームをお使いください。`,
+    },
+  ];
+  const faqItems = [...commonFaq, ...(variant.buildFaq?.(pref) ?? [])];
 
   const faqJsonLd =
     faqItems.length > 0
