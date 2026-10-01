@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
+import { sendGAEvent } from "@next/third-parties/google";
 import { REGION_LABELS, RegionKey } from "@/lib/prefectures";
 import { BAND_LABELS, BAND_HINTS, TravelBand } from "@/lib/distanceBands";
 import { tonightRange, tomorrowRange, thisWeekendRange, DateRange } from "@/lib/dates";
+import { getAbVariantLabel } from "@/lib/abTest";
 
 export type RangeMode = "none" | "band" | "region";
 
@@ -37,6 +39,7 @@ export default function SearchForm({
   initialCheckoutDate,
   initialMaxCharge,
   initialOnsen,
+  ctaVariant,
 }: {
   onSearch: (values: SearchValues) => void;
   loading: boolean;
@@ -47,6 +50,11 @@ export default function SearchForm({
   initialCheckoutDate?: string;
   initialMaxCharge?: number;
   initialOnsen?: boolean;
+  /**
+   * lib/abTest.ts `search_cta_copy`で割り当てられたバリアントID。検索ボタンの
+   * 文言を出し分け、送信イベントにもタグ付けする(2026-10-02)。未指定時はcontrol扱い。
+   */
+  ctaVariant?: string;
 }) {
   const [address, setAddress] = useState("");
   const [checkinDate, setCheckinDate] = useState(initialCheckinDate ?? "");
@@ -70,14 +78,19 @@ export default function SearchForm({
   function submitSearch(preset: string) {
     // 広告経由の流入がどこまで検索実行(コンバージョンの第一歩)に至っているかを見るための
     // イベント計測。住所などの個人情報は送らず、検索条件の傾向のみ記録する。
-    track("search_submit", {
+    const searchSubmitPayload = {
       mode,
       preset,
       onsen,
       nonSmoking,
       hasMaxCharge: Boolean(maxCharge),
       sort,
-    });
+      ...(ctaVariant ? { ab_search_cta: ctaVariant } : {}),
+    };
+    track("search_submit", searchSubmitPayload);
+    // Vercel AnalyticsのカスタムイベントはHobbyプランでは非公開機能のため
+    // (どこいく/tech-stack参照)、A/Bテストの分析に使うGA4側にも同じイベントを送る。
+    sendGAEvent("event", "search_submit", searchSubmitPayload);
     onSearch({
       address,
       checkinDate,
@@ -381,7 +394,7 @@ export default function SearchForm({
           disabled={loading}
           className="w-full md:w-auto px-8 py-3 rounded-full bg-accent text-white font-display font-bold text-sm tracking-wide disabled:opacity-50 hover:brightness-110 transition"
         >
-          {loading ? "検索中…" : "空室を探す"}
+          {loading ? "検索中…" : getAbVariantLabel("search_cta_copy", ctaVariant ?? "control")}
         </button>
       </div>
     </form>

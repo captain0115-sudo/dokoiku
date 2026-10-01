@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { sendGAEvent } from "@next/third-parties/google";
 import SearchForm, { SearchValues } from "@/components/SearchForm";
 import HotelList from "@/components/HotelList";
 import HotelListSkeleton from "@/components/HotelListSkeleton";
@@ -9,6 +10,7 @@ import type { HotelResult } from "@/lib/rakuten";
 import { nightsBetween } from "@/lib/dates";
 import { regionKeyForPrefecture, type RegionKey } from "@/lib/prefectures";
 import type { TravelBand } from "@/lib/distanceBands";
+import { resolveAbVariant } from "@/lib/abTest";
 
 /**
  * トップページの検索フォーム・検索結果部分(インタラクティブ)。
@@ -48,6 +50,18 @@ export default function HomeSearch() {
   const [searched, setSearched] = useState(false);
   const [pickedHotelNo, setPickedHotelNo] = useState<number | null>(null);
   const [nights, setNights] = useState(1);
+
+  // 検索ボタン文言のA/Bテスト(lib/abTest.ts `search_cta_copy`、2026-10-02開始)。
+  // SSRとの不一致を避けるため、初回描画はcontrol固定で行い、マウント後に
+  // localStorageの割り当てへ切り替える(新規訪問者はここで初めて抽選される)。
+  const [ctaVariant, setCtaVariant] = useState("control");
+  useEffect(() => {
+    setCtaVariant(
+      resolveAbVariant("search_cta_copy", (testId, variantId) => {
+        sendGAEvent("event", "ab_test_exposure", { test_id: testId, ab_variant: variantId });
+      })
+    );
+  }, []);
 
   function buildQuery(values: SearchValues) {
     const query = new URLSearchParams({
@@ -144,6 +158,7 @@ export default function HomeSearch() {
           initialCheckoutDate={prefillCheckout}
           initialMaxCharge={prefillMaxCharge}
           initialOnsen={prefillOnsen}
+          ctaVariant={ctaVariant}
         />
       </div>
 
@@ -202,6 +217,7 @@ export default function HomeSearch() {
               originLabel={originLabel}
               highlightedHotelNo={pickedHotelNo}
               nights={nights}
+              abSearchCtaVariant={ctaVariant}
             />
           </>
         )}

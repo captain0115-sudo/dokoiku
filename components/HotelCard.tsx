@@ -11,10 +11,18 @@ export default function HotelCard({
   nights = 1,
   distanceLabel = "起点から",
   areaLabel,
+  abSearchCtaVariant,
 }: {
   hotel: HotelResult;
   highlighted?: boolean;
   nights?: number;
+  /**
+   * トップページ検索ボタンのA/Bテスト(lib/abTest.ts `search_cta_copy`)で
+   * この訪問者に割り当てられたバリアントID。コンバージョン(hotel_click)側にも
+   * タグ付けして、GA4でバリアント別の成約率を比較できるようにする(2026-10-02)。
+   * トップページ以外からの呼び出しでは未指定のままでよい。
+   */
+  abSearchCtaVariant?: string;
   /**
    * 距離の基準点のラベル。トップページの通常検索では「起点となる住所」入力欄(現在地・
    * 任意の住所いずれも指定可能、必ずしも実際の自宅とは限らない)を指す。エリアページ・
@@ -48,6 +56,7 @@ export default function HotelCard({
           hotelName: hotel.hotelName,
           price: hotel.hotelMinCharge,
           highlighted: Boolean(highlighted),
+          ...(abSearchCtaVariant ? { ab_search_cta: abSearchCtaVariant } : {}),
         };
         track("hotel_click", payload);
         sendGAEvent("event", "hotel_click", payload);

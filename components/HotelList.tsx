@@ -10,11 +10,14 @@ export default function HotelList({
   originLabel,
   highlightedHotelNo,
   nights,
+  abSearchCtaVariant,
 }: {
   hotels: HotelResult[];
   originLabel?: string;
   highlightedHotelNo?: number | null;
   nights?: number;
+  /** lib/abTest.ts `search_cta_copy`のバリアントID。hotel_clickに引き継いでタグ付けする */
+  abSearchCtaVariant?: string;
 }) {
   if (hotels.length === 0) {
     return (
@@ -75,6 +78,7 @@ export default function HotelList({
                 hotel={hotel}
                 highlighted={hotel.hotelNo === highlightedHotelNo}
                 nights={nights}
+                abSearchCtaVariant={abSearchCtaVariant}
               />
             ))}
           </div>
