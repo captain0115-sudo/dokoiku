@@ -156,6 +156,50 @@ export default function Home() {
         </details>
       </section>
 
+      {/* 2026-10-02 GSC調査で判明: /areas/[code]/budget(1万円以下)バリエーションが
+          軒並み平均掲載順位18〜40位台(2〜4ページ目)に沈んでおり、表示回数は数百〜
+          1000件超あってもクリック0件という状態が複数県で同時発生していた(例:
+          nara/budget 1,231回表示・0クリック・18.0位、okinawa/budget 212回・0件・39.5位、
+          kagoshima/budget 196回・0件・38.5位)。トップページの「人気の探し方」では
+          budgetバリエーションを3県分しかリンクしておらず(POPULAR_VARIANT_LINKS)、
+          残り44県分のbudgetページはトップページから直接たどり着けていなかった
+          ([[seo-win-pattern]]2026-08-28指摘の内部リンク不足が、budgetバリエーションでは
+          未解消のまま残っていたと判断)。weekendバリエーション(都道府県からすぐ探す)と
+          同じ形で全47都道府県分へのリンクを追加し、内部リンク評価を底上げする。 */}
+      <section className="mt-10">
+        <details className="rounded-2xl border border-line bg-surface p-4 group">
+          <summary className="font-display font-bold text-ink text-base cursor-pointer list-none flex items-center justify-between gap-2">
+            格安ホテル(1万円以下)からすぐ探す
+            <span className="text-sub text-xs font-mono shrink-0 group-open:rotate-180 transition-transform">
+              ▼
+            </span>
+          </summary>
+          <p className="text-sub text-xs font-body leading-relaxed mt-2 mb-4">
+            地方ごとにまとめた都道府県一覧です。タップすると、その都道府県で1泊1万円以下の空室だけを価格の安い順にすぐ確認できます。
+          </p>
+          <div className="flex flex-col gap-3">
+            {(Object.keys(REGION_LABELS) as RegionKey[]).map((key) => (
+              <div key={key}>
+                <p className="text-sub text-xs font-mono tracking-wideLabel uppercase mb-2">
+                  {REGION_LABELS[key]}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {prefecturesInRegion(key).map((p) => (
+                    <Link
+                      key={p.middleClassCode}
+                      href={`/areas/${p.middleClassCode}/budget`}
+                      className="pill-button pill-button-inactive text-xs"
+                    >
+                      {p.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
+      </section>
+
       {/* SEO監査(2026-08-13)で指摘: H2見出しが一切なくサービス説明が薄いとのことで追加。
           既存機能の説明のみで、実績・効果を誇張する表現は入れない。 */}
       <section className="mt-14">
