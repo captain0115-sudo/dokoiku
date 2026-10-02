@@ -198,41 +198,66 @@ async function requestVacantHotels(
     return [];
   }
 
-  const results: HotelResult[] = data.hotels.map((h: any) => {
-    const basic = h.hotel[0].hotelBasicInfo;
-    // basic.hotelMinChargeは楽天の仕様上「1部屋1泊あたりの最安値の目安」であり、
-    // 検索条件のadultNum(人数)に対応した金額とは限らない(実際に検証したところ、
-    // 指定人数では成立しない安いプランの金額が混ざり、実際の1名利用料金より
-    // 大幅に低く表示されるケースが確認された)。h.hotel[1].roomInfoには
-    // 検索条件(人数・日程)に一致する実際のプランの日別料金(dailyCharge)が
-    // 含まれているため、取得できる場合はそちらを優先して使う(2026-08-13対応)。
-    const roomInfoEntries: any[] = h.hotel[1]?.roomInfo ?? [];
-    const dailyChargeEntry = roomInfoEntries.find((e) => e.dailyCharge);
-    const accurateCharge = dailyChargeEntry?.dailyCharge?.total;
-    return {
-      hotelNo: basic.hotelNo,
-      hotelName: basic.hotelName,
-      hotelMinCharge: accurateCharge ?? basic.hotelMinCharge,
-      latitude: basic.latitude,
-      longitude: basic.longitude,
-      hotelImageUrl: basic.hotelImageUrl,
-      hotelInformationUrl: basic.hotelInformationUrl,
-      planListUrl: buildPlanUrl(
-        basic.planListUrl || basic.hotelInformationUrl,
-        checkinDate,
-        checkoutDate,
-        guests
-      ),
-      reviewAverage: basic.reviewAverage,
-      reviewCount: basic.reviewCount ?? null,
-      distanceKm: haversineDistanceKm(
-        homeLat,
-        homeLng,
-        basic.latitude,
-        basic.longitude
-      ),
-    };
-  });
+  // 「お誕生日プラン」「70歳以上+今年の干支+当日誕生日」等、極めて限定的な条件
+  // (当日が誕生日である等、ほぼ誰も実際には満たせない条件)を満たした場合のみ
+  // 適用される記念日・条件付きプランが、楽天API上はhotelMinCharge・dailyChargeの
+  // 両方に「通常予約できる最安値」として紛れ込むことが判明した(2026-10-03、
+  // どこいくInstagram投稿の下調べ中に沖縄県の格安ホテルページで¥1・¥500という
+  // 不自然な表示を発見して調査。roomName/planNameに「誕生日」等の条件が明記されて
+  // おり、実際にほぼ誰も予約できない金額だった)。実データ原則はAPIが返した数値を
+  // 改変しない、という意味であり、一般の訪問者が実際に予約できない金額を
+  // 「最安値」として表示し続けることは優良誤認のリスクがあるため、この種の
+  // 条件付きプランしか価格情報が無いホテルは結果から除外する。
+  const CONDITIONAL_PLAN_PATTERN =
+    /誕生日|記念日|該当すれば|要証明|要身分証/;
+
+  const results: HotelResult[] = data.hotels
+    .map((h: any) => {
+      const basic = h.hotel[0].hotelBasicInfo;
+      // basic.hotelMinChargeは楽天の仕様上「1部屋1泊あたりの最安値の目安」であり、
+      // 検索条件のadultNum(人数)に対応した金額とは限らない(実際に検証したところ、
+      // 指定人数では成立しない安いプランの金額が混ざり、実際の1名利用料金より
+      // 大幅に低く表示されるケースが確認された)。h.hotel[1].roomInfoには
+      // 検索条件(人数・日程)に一致する実際のプランの日別料金(dailyCharge)が
+      // 含まれているため、取得できる場合はそちらを優先して使う(2026-08-13対応)。
+      const roomInfoEntries: any[] = h.hotel[1]?.roomInfo ?? [];
+      const dailyChargeEntry = roomInfoEntries.find((e) => e.dailyCharge);
+      const roomBasicEntry = roomInfoEntries.find((e) => e.roomBasicInfo);
+      const roomLabel = [
+        roomBasicEntry?.roomBasicInfo?.roomName,
+        roomBasicEntry?.roomBasicInfo?.planName,
+      ]
+        .filter(Boolean)
+        .join(" ");
+      if (CONDITIONAL_PLAN_PATTERN.test(roomLabel)) {
+        return null;
+      }
+      const accurateCharge = dailyChargeEntry?.dailyCharge?.total;
+      return {
+        hotelNo: basic.hotelNo,
+        hotelName: basic.hotelName,
+        hotelMinCharge: accurateCharge ?? basic.hotelMinCharge,
+        latitude: basic.latitude,
+        longitude: basic.longitude,
+        hotelImageUrl: basic.hotelImageUrl,
+        hotelInformationUrl: basic.hotelInformationUrl,
+        planListUrl: buildPlanUrl(
+          basic.planListUrl || basic.hotelInformationUrl,
+          checkinDate,
+          checkoutDate,
+          guests
+        ),
+        reviewAverage: basic.reviewAverage,
+        reviewCount: basic.reviewCount ?? null,
+        distanceKm: haversineDistanceKm(
+          homeLat,
+          homeLng,
+          basic.latitude,
+          basic.longitude
+        ),
+      };
+    })
+    .filter((r: HotelResult | null): r is HotelResult => r !== null);
 
   return results;
 }
