@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Logo from "@/components/Logo";
 import HotelCard from "@/components/HotelCard";
+import AgodaCompareLink from "@/components/AgodaCompareLink";
+import { buildAgodaCompareUrl } from "@/lib/agoda";
 import ShareButtons from "@/components/ShareButtons";
 import {
   findPrefecture,
@@ -50,6 +52,19 @@ export default async function AreaVariantPage({ code, variant }: Props) {
 
   const { checkinDate, checkoutDate } = variant.dateRange();
   const nights = nightsBetween(checkinDate, checkoutDate);
+  const agodaUrl = buildAgodaCompareUrl({
+    middleClassCode: pref.middleClassCode,
+    checkinDate,
+    nights,
+    adults: 1,
+  });
+  const agodaLink = agodaUrl ? (
+    <AgodaCompareLink
+      href={agodaUrl}
+      areaName={pref.name}
+      cityName={pref.capital.replace(/市$/, "")}
+    />
+  ) : null;
 
   let hotels: HotelResult[] = [];
   let fetchFailed = false;
@@ -246,6 +261,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
       {!fetchFailed && hotels.length === 0 && (
         <div className="bg-surface border border-line rounded-2xl p-8 text-center text-sub font-body text-sm mb-8">
           {variant.emptyMessage}
+          {agodaLink && <div className="mt-4 -mx-8 -mb-8 text-left">{agodaLink}</div>}
         </div>
       )}
 
@@ -267,6 +283,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
               />
             ))}
           </div>
+          {agodaLink}
         </div>
       )}
 

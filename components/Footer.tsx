@@ -91,8 +91,9 @@ export default function Footer() {
         </div>
 
         <p className="text-sub text-xs font-body">
-          【PR】本サイトは楽天アフィリエイトプログラムに参加しており、
-          掲載する宿泊施設へのリンクから成果報酬を受け取る場合があります。
+          【PR】本サイトは楽天アフィリエイトプログラム・A8.net(アゴダ等)の
+          アフィリエイトプログラムに参加しており、掲載する宿泊施設・予約サイトへの
+          リンクから成果報酬を受け取る場合があります。
         </p>
         <div className="flex gap-4">
           <Link
