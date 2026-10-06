@@ -58,13 +58,17 @@ export default async function AreaVariantPage({ code, variant }: Props) {
     nights,
     adults: 1,
   });
-  const agodaLink = agodaUrl ? (
-    <AgodaCompareLink
-      href={agodaUrl}
-      areaName={pref.name}
-      cityName={pref.capital.replace(/市$/, "")}
-    />
-  ) : null;
+  const agodaCity = pref.capital.replace(/市$/, "");
+  const agodaLinkFor = (position: "top" | "bottom") =>
+    agodaUrl ? (
+      <AgodaCompareLink
+        href={agodaUrl}
+        areaName={pref.name}
+        cityName={agodaCity}
+        position={position}
+      />
+    ) : null;
+  const agodaLink = agodaLinkFor("bottom");
 
   let hotels: HotelResult[] = [];
   let fetchFailed = false;
@@ -272,6 +276,7 @@ export default async function AreaVariantPage({ code, variant }: Props) {
               {variant.buildResultsHeading(pref.name, hotels.length)}
             </h2>
           </div>
+          {agodaLinkFor("top")}
           <div className="px-3 divide-y divide-line">
             {hotels.map((hotel) => (
               <HotelCard
