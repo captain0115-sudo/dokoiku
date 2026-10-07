@@ -211,6 +211,16 @@ async function requestVacantHotels(
   const CONDITIONAL_PLAN_PATTERN =
     /誕生日|記念日|該当すれば|要証明|要身分証/;
 
+  // 2026-10-08発見: 一戸建て・貸別荘タイプの宿泊施設で、代表プランが
+  // 「【3名様以上プラン】」等、検索した人数では本来利用できない最低人数条件つき
+  // プランになっているケースがあった(岐阜県`/newyear2027`で評価なしの宿が
+  // 大人1名検索にもかかわらず¥99,760〜と表示されていた実例。実体は一戸建て全体の
+  // 3名以上向け料金で、1名では予約できない)。誕生日プラン等と同じ「検索条件では
+  // 実際には成立しないプランが代表値として紛れ込む」系統の問題だが、こちらは
+  // 人数を満たせば正当に予約できるプランのため、一律除外ではなく実際の検索人数が
+  // 最低人数未満の場合のみ除外する(人数の多い検索では正しく表示されるべきため)。
+  const MIN_GUESTS_PATTERN = /(\d+)\s*名様?以上/;
+
   const results: HotelResult[] = data.hotels
     .map((h: any) => {
       const basic = h.hotel[0].hotelBasicInfo;
@@ -231,6 +241,16 @@ async function requestVacantHotels(
         .join(" ");
       if (CONDITIONAL_PLAN_PATTERN.test(roomLabel)) {
         return null;
+      }
+      const minGuestsMatch = roomLabel.match(MIN_GUESTS_PATTERN);
+      if (minGuestsMatch) {
+        const requiredGuests = Number(minGuestsMatch[1]);
+        // 幼児(infants)は添い寝等で人数条件に含まれないことが多いため、
+        // 大人+子供(小学生)のみを実際の利用人数として比較する。
+        const searchedGuests = (guests?.adults ?? 1) + (guests?.children ?? 0);
+        if (searchedGuests < requiredGuests) {
+          return null;
+        }
       }
       const accurateCharge = dailyChargeEntry?.dailyCharge?.total;
       return {
