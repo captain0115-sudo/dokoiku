@@ -29,6 +29,13 @@ export default function Footer() {
           >
             スポーツの日3連休(10/10〜12)空室ホテル特集
           </Link>
+          <br />
+          <Link
+            href="/newyear2027"
+            className="text-sub text-xs font-body underline hover:text-ink"
+          >
+            年末年始(12/30〜1/1)空室ホテル特集
+          </Link>
         </div>
 
         <div>

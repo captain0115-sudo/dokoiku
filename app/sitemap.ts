@@ -37,6 +37,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      // 季節特集: 年末年始(12/30〜1/1)。成長戦略(年末年始特集を10月中に作成・公開)
+      // に基づき、繁忙期より前に公開してGoogleのクロール・インデックスに猶予を
+      // 持たせる狙い(2026-10-08追加)。スポーツの日特集(10/12終了)が過ぎたら、
+      // 上のエントリをこちらに交代し、トップページ・Footerの導線もこちらに切り替える。
+      url: `${baseUrl}/newyear2027`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
       changeFrequency: "yearly",
