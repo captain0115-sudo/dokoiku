@@ -62,9 +62,16 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     key: "weekend",
     pathSuffix: "",
     navLabel: "週末の空室(通常)",
-    buildTitle: (name) => `${name}の空室ホテル一覧｜今すぐ・価格が安い順 - どこいく`,
+    // 2026-10-09: GSCの実クエリ(大阪府ページ)で「大阪 ホテル 空き 状況」(53表示・掲載順位8.9)・
+    // 「空室状況」(35表示・8.9)・「大阪 ホテル 空き」(23表示・12.0)・「大阪ホテル空き状況」
+    // (21表示・8.2)のように、1ページ目相当の好順位にもかかわらずクリック0件という
+    // クエリが複数見つかった。H1(buildHeading)は既に「のホテル空室状況」だったが、
+    // <title>タグは「空室ホテル一覧」という別表現で、検索結果の強調表示(太字)に
+    // 乗れていなかった可能性が高い。tonightバリエーション(2026-09-09に同じ理由で
+    // 「空室状況」をタイトル冒頭に入れて成功)と同じ修正をweekendにも適用する。
+    buildTitle: (name) => `${name}のホテル空室状況｜今すぐ比較・価格が安い順 - どこいく`,
     buildDescription: (name, catchphrase) =>
-      `${name}で今空いているホテルを価格が安い順に一覧表示。日付を指定して、行き先を${name}に限定した検索もできます。${catchphrase}が魅力のエリアです。`,
+      `${name}のホテルの空き状況を今すぐ確認。価格が安い順に一覧表示します。日付を指定して、行き先を${name}に限定した検索もできます。${catchphrase}が魅力のエリアです。`,
     buildHeading: (name) => `${name}のホテル空室状況`,
     buildResultsHeading: (name, count) => `${name}のホテル空室一覧(${count}件)`,
     buildIntroExtra: () => "",
