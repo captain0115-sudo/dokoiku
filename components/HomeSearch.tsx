@@ -50,6 +50,8 @@ export default function HomeSearch() {
   const [searched, setSearched] = useState(false);
   const [pickedHotelNo, setPickedHotelNo] = useState<number | null>(null);
   const [nights, setNights] = useState(1);
+  // アゴダ比較リンク(2026-10-10)用に、直近の検索の日程・人数を保持する
+  const [agodaParams, setAgodaParams] = useState<{ checkinDate: string; adults: number }>();
 
   // 検索ボタン文言のA/Bテスト(lib/abTest.ts `search_cta_copy`、2026-10-02開始)。
   // SSRとの不一致を避けるため、初回描画はcontrol固定で行い、マウント後に
@@ -89,6 +91,7 @@ export default function HomeSearch() {
     setPickedHotelNo(null);
     setSearchedAreas([]);
     setNights(nightsBetween(values.checkinDate, values.checkoutDate));
+    setAgodaParams({ checkinDate: values.checkinDate, adults: values.adults });
 
     try {
       // 先に「どのエリアを検索するか」だけ軽量に取得し、待ち時間中に表示する
@@ -218,6 +221,7 @@ export default function HomeSearch() {
               highlightedHotelNo={pickedHotelNo}
               nights={nights}
               abSearchCtaVariant={ctaVariant}
+              agodaParams={agodaParams}
             />
           </>
         )}

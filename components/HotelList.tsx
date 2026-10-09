@@ -1,6 +1,9 @@
 import type { HotelResult } from "@/lib/rakuten";
 import HotelCard from "./HotelCard";
 import ShareButtons from "./ShareButtons";
+import AgodaCompareLink from "./AgodaCompareLink";
+import { buildAgodaCompareUrl } from "@/lib/agoda";
+import { PREFECTURES } from "@/lib/prefectures";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dokoiku.tokyo";
@@ -11,6 +14,7 @@ export default function HotelList({
   highlightedHotelNo,
   nights,
   abSearchCtaVariant,
+  agodaParams,
 }: {
   hotels: HotelResult[];
   originLabel?: string;
@@ -18,6 +22,11 @@ export default function HotelList({
   nights?: number;
   /** lib/abTest.ts `search_cta_copy`のバリアントID。hotel_clickに引き継いでタグ付けする */
   abSearchCtaVariant?: string;
+  /**
+   * 検索の日程・人数。指定時は都道府県グループごとにアゴダの比較リンク(A8.net経由のPR)を出す
+   * (2026-10-10、トップページの通常検索でも比較できるようにするため)
+   */
+  agodaParams?: { checkinDate: string; adults: number };
 }) {
   if (hotels.length === 0) {
     return (
@@ -71,6 +80,26 @@ export default function HotelList({
               {group.areaName}({group.hotels.length}件)
             </span>
           </div>
+          {(() => {
+            const pref = PREFECTURES.find((p) => p.name === group.areaName);
+            const href =
+              pref && agodaParams
+                ? buildAgodaCompareUrl({
+                    middleClassCode: pref.middleClassCode,
+                    checkinDate: agodaParams.checkinDate,
+                    nights: nights ?? 1,
+                    adults: agodaParams.adults,
+                  })
+                : null;
+            return pref && href ? (
+              <AgodaCompareLink
+                href={href}
+                areaName={pref.name}
+                cityName={pref.capital.replace(/市$/, "")}
+                position="top"
+              />
+            ) : null;
+          })()}
           <div className="px-3 divide-y divide-line">
             {group.hotels.map((hotel) => (
               <HotelCard
