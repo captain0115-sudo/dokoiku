@@ -93,6 +93,16 @@ export const AREA_VARIANTS: Record<AreaVariantKey, AreaVariant> = {
     dateRange: thisWeekendRange,
     filters: { onsen: true },
     emptyMessage: "この日程では、条件に合う温泉宿の空室が見つかりませんでした。",
+    // 2026-11-01: GSC実クエリで「どこいく 札幌」(28日間143表示・掲載順位7.4位・クリック0件)
+    // のように県庁所在地名を含む検索が、実際には都道府県名のみの本ページ(/areas/hokkaido/onsen)に
+    // ヒットしていると判明。tonight/budgetバリエーション(2026-09-17・09-02)と同じ理由付けで、
+    // 県庁所在地名をFAQ本文に自然な形で追加し、検索語との一致度を上げる。
+    buildFaq: (pref) => [
+      {
+        q: `${pref.capital}にある温泉宿も探せますか?`,
+        a: `このページは${pref.name}全体を対象に、現在空室のある温泉宿を価格の安い順に表示しています。${pref.capital}を含む${pref.name}内の温泉宿も、条件に合えば一覧に含まれます。`,
+      },
+    ],
   },
   tonight: {
     key: "tonight",
